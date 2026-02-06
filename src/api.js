@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'https://claims-idp-backend-bbe0f4hkckhdcubv.centralus-01.azurewebsites.net';
+const API_BASE = 'http://localhost:8000'; // Adjust as needed
 
 export async function fetchFNOLs() {
   const res = await axios.get(`${API_BASE}/fnol/`);

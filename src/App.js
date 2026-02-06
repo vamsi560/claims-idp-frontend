@@ -34,8 +34,22 @@ function App() {
         {loading && <p>Loading...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
         {!loading && !error && !editingItem && (
-          <FNOLList workItems={workItems} onEdit={setEditingItem} />
+          <FNOLList
+            workItems={deduplicateWorkItems(workItems)}
+            onEdit={setEditingItem}
+          />
         )}
+        // Helper to deduplicate work items by message_id (if present), keeping the first occurrence
+        function deduplicateWorkItems(items) {
+          const seen = new Set();
+          return items.filter(item => {
+            if (item.message_id) {
+              if (seen.has(item.message_id)) return false;
+              seen.add(item.message_id);
+            }
+            return true;
+          });
+        }
         {editingItem && (
           <FNOLEdit workItem={editingItem} onBack={() => setEditingItem(null)} />
         )}
