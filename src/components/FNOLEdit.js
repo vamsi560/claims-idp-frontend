@@ -39,38 +39,88 @@ function FNOLEdit({ workItem, onBack }) {
     }
   };
 
+  // Helper to render nested fields dynamically
+  const renderFields = (obj, parentKey = '') => {
+    if (obj == null) return <span>—</span>;
+    if (Array.isArray(obj)) {
+      if (obj.length === 0) return <span>—</span>;
+      // Render array of objects or primitives
+      if (typeof obj[0] === 'object') {
+        return (
+          <div style={{ marginBottom: '12px' }}>
+            {obj.map((item, idx) => (
+              <div key={idx} style={{ marginBottom: 8, paddingLeft: 8, borderLeft: '2px solid #e0e0e0' }}>
+                {renderFields(item, parentKey)}
+              </div>
+            ))}
+          </div>
+        );
+      } else {
+        return <span>{obj.join(', ')}</span>;
+      }
+    }
+    if (typeof obj === 'object') {
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px', marginBottom: 12 }}>
+          {Object.entries(obj).map(([key, value]) => (
+            <React.Fragment key={parentKey + key}>
+              <label htmlFor={parentKey + key}>{key.replace(/_/g, ' ')}</label>
+              {typeof value === 'object' && value !== null ? (
+                <div style={{ padding: 0 }}>{renderFields(value, parentKey + key + '.')}</div>
+              ) : (
+                <input
+                  id={parentKey + key}
+                  name={parentKey + key}
+                  value={value == null ? '' : value}
+                  onChange={e => {
+                    // Deep update for nested fields
+                    const update = (o, k, v) => {
+                      if (k.length === 1) return { ...o, [k[0]]: v };
+                      return { ...o, [k[0]]: update(o[k[0]] || {}, k.slice(1), v) };
+                    };
+                    setFields(f => update(f, (parentKey + key).split('.'), e.target.value));
+                  }}
+                />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      );
+    }
+    // Primitive
+    return <input value={obj} readOnly />;
+  };
+
   return (
-    <div>
+    <div className="card">
       <h3>Edit FNOL</h3>
-      <div>
+      <div style={{ marginBottom: '12px' }}>
         <strong>Subject:</strong> {workItem.email_subject}
       </div>
-      <div>
+      <div style={{ marginBottom: '12px' }}>
         <strong>Status:</strong> {workItem.status || 'pending'}
       </div>
-      <div>
+      <div style={{ marginBottom: '18px' }}>
         <strong>Email Body:</strong>
-        <pre style={{ background: '#f8f8f8', padding: '8px' }}>{workItem.email_body}</pre>
+        <pre>{workItem.email_body}</pre>
       </div>
       <h4>Extracted Fields</h4>
-      {Object.keys(fields).length === 0 ? (
-        <p>No extracted fields.</p>
-      ) : (
-        <form onSubmit={e => e.preventDefault()}>
-          {Object.entries(fields).map(([key, value]) => (
-            <div key={key} style={{ marginBottom: '8px' }}>
-              <label>
-                {key}: <input name={key} value={value} onChange={handleChange} />
-              </label>
-            </div>
-          ))}
-        </form>
-      )}
+      <div className="extracted-fields">
+        {Object.keys(fields).length === 0 ? (
+          <p>No extracted fields.</p>
+        ) : (
+          <form onSubmit={e => e.preventDefault()}>
+            {renderFields(fields)}
+          </form>
+        )}
+      </div>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {success && <p style={{ color: 'green' }}>{success}</p>}
-      <button onClick={onBack} style={{ marginTop: '16px', marginRight: '8px' }}>Back</button>
-      <button onClick={handleSave} disabled={saving} style={{ marginTop: '16px', marginRight: '8px' }}>Save</button>
-      <button onClick={handleSubmit} disabled={saving} style={{ marginTop: '16px' }}>Submit</button>
+      <div style={{ marginTop: '18px' }}>
+        <button onClick={onBack}>Back</button>
+        <button onClick={handleSave} disabled={saving}>Save</button>
+        <button onClick={handleSubmit} disabled={saving}>Submit</button>
+      </div>
     </div>
   );
 }

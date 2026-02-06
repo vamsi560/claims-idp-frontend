@@ -5,6 +5,7 @@ import FNOLList from './components/FNOLList';
 import FNOLEdit from './components/FNOLEdit';
 import { fetchFNOLs } from './api';
 
+
 function App() {
 
   const [workItems, setWorkItems] = useState([]);
@@ -27,18 +28,21 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <h1>FNOL Workbench</h1>
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {!loading && !error && !editingItem && (
-        <FNOLList workItems={workItems} onEdit={setEditingItem} />
-      )}
-      {editingItem && (
-        <FNOLEdit workItem={editingItem} onBack={() => setEditingItem(null)} />
-      )}
-    </div>
+    <>
+      <div className="app-header">FNOL Workbench</div>
+      <div className="main-content">
+        {loading && <p>Loading...</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {!loading && !error && !editingItem && (
+          <FNOLList workItems={workItems} onEdit={setEditingItem} />
+        )}
+        {editingItem && (
+          <FNOLEdit workItem={editingItem} onBack={() => setEditingItem(null)} />
+        )}
+      </div>
+    </>
   );
 }
 
 export default App;
+import './App.css';
