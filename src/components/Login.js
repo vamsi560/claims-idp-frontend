@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import './Login.css';
 
@@ -20,24 +21,18 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-left">
-        <div className="login-logo">
-          <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" className="company-logo" />
-          <img src="/images/lock-login.png" alt="Lock" className="lock-icon" />
-        </div>
-        <div className="login-workbench">Claims Workbench</div>
-      </div>
-      <div className="login-right">
-        <form className="login-form" onSubmit={handleSubmit}>
-          <h2>Sign In to Your Account</h2>
-          <label>Email Address</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-          <label>Password</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+    <div className="login-modern-bg">
+      <div className="login-modern-panel">
+        <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" className="company-logo-modern" />
+        <img src="/images/lock-login.png" alt="Lock" className="lock-icon-modern" />
+        <div className="login-modern-title">Claims Workbench</div>
+        <form className="login-modern-form" onSubmit={handleSubmit}>
+          <h2>Sign In</h2>
+          <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required />
+          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
           <button type="submit">Sign In</button>
-          {error && <div className="login-error">{error}</div>}
-          <div className="login-forgot">Forgot password?</div>
+          {error && <div className="login-modern-error">{error}</div>}
+          <div className="login-modern-forgot">Forgot password?</div>
         </form>
       </div>
     </div>

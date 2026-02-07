@@ -1,3 +1,83 @@
+.login-modern-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #183a5a 70%, #bfa14a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-modern-panel {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 4px 32px rgba(24,58,90,0.12);
+  padding: 48px 36px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 380px;
+}
+.company-logo-modern {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1.2rem;
+}
+.lock-icon-modern {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.2rem;
+  display: block;
+}
+.login-modern-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #183a5a;
+  margin-bottom: 2rem;
+  letter-spacing: 1px;
+}
+.login-modern-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.login-modern-form h2 {
+  color: #183a5a;
+  margin-bottom: 1rem;
+}
+.login-modern-form input {
+  padding: 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #f4f6fa;
+}
+.login-modern-form button {
+  background: #183a5a;
+  color: #fff;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.2s;
+}
+.login-modern-form button:hover {
+  background: #bfa14a;
+  color: #183a5a;
+}
+.login-modern-error {
+  color: #d32f2f;
+  font-size: 1rem;
+  margin-top: -0.5rem;
+}
+.login-modern-forgot {
+  color: #183a5a;
+  font-size: 0.95rem;
+  text-align: right;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
 .lock-icon {
   width: 120px;
   height: 120px;

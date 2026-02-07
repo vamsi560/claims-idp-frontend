@@ -58,7 +58,15 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
             >{tab}</div>
           ))}
         </div>
-        {activeTab === 'Extracted Data' && selectedClaim && renderExtractedFields(selectedClaim.extracted_fields)}
+        {activeTab === 'Extracted Data' && selectedClaim && (
+          <>
+            {renderExtractedFields(selectedClaim.extracted_fields)}
+            <div style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
+              <button className="fnol-view-email-btn">Save</button>
+              <button className="fnol-view-email-btn">Submit</button>
+            </div>
+          </>
+        )}
         {activeTab === 'Summary' && selectedClaim && (
           <div style={{ marginBottom: '24px' }}>
             <strong>Summary:</strong> {selectedClaim.extracted_fields?.summary || '—'}
@@ -76,9 +84,7 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
             <strong>Attachments:</strong> {selectedClaim.attachments?.length ? selectedClaim.attachments.join(', ') : '—'}
           </div>
         )}
-        {selectedClaim && (
-          <button className="fnol-view-email-btn">View Original Email</button>
-        )}
+        {/* No View Original Email button, replaced by Save/Submit */}
       </main>
     </div>
   );
