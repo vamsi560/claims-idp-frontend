@@ -6,12 +6,16 @@ import Login from './components/Login';
 import { fetchFNOLs } from './api';
 import './App.css';
 
+
 function App() {
   const [workItems, setWorkItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  // Sorting/filtering state (must be at top level)
+  const [sortBy, setSortBy] = useState('date');
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     if (!loggedIn) return;
@@ -49,9 +53,6 @@ function App() {
   // Show all FNOL work items
   const allClaims = deduplicateWorkItems(workItems);
 
-  // Sorting/filtering state
-  const [sortBy, setSortBy] = useState('date');
-  const [filter, setFilter] = useState('');
 
   // Sort and filter claims
   let filteredClaims = allClaims.filter(claim => {
