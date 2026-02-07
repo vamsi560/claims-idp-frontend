@@ -23,10 +23,11 @@ export default function Login({ onLogin }) {
     <div className="login-container">
       <div className="login-left">
         <div className="login-logo">
+          <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" className="company-logo" />
           <div className="shield-icon" />
           <div className="login-title">FNL Claims Automation</div>
         </div>
-        <div className="login-secure">Secure Login</div>
+        <div className="login-workbench">Claims Workbench</div>
       </div>
       <div className="login-right">
         <form className="login-form" onSubmit={handleSubmit}>

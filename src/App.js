@@ -1,8 +1,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import FNOLList from './components/FNOLList';
-import FNOLEdit from './components/FNOLEdit';
+import FNOLDashboard from './components/FNOLDashboard';
 import Login from './components/Login';
 import { fetchFNOLs } from './api';
 import './App.css';
@@ -11,7 +10,7 @@ function App() {
   const [workItems, setWorkItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editingItem, setEditingItem] = useState(null);
+  const [selectedClaim, setSelectedClaim] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -46,20 +45,15 @@ function App() {
 
   return (
     <>
-      <div className="app-header">FNOL Workbench</div>
-      <div className="main-content">
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {!loading && !error && !editingItem && (
-          <FNOLList
-            workItems={deduplicateWorkItems(workItems)}
-            onEdit={setEditingItem}
-          />
-        )}
-        {editingItem && (
-          <FNOLEdit workItem={editingItem} onBack={() => setEditingItem(null)} />
-        )}
-      </div>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {!loading && !error && (
+        <FNOLDashboard
+          claims={deduplicateWorkItems(workItems)}
+          selectedClaim={selectedClaim || deduplicateWorkItems(workItems)[0]}
+          onSelectClaim={setSelectedClaim}
+        />
+      )}
     </>
   );
 }
