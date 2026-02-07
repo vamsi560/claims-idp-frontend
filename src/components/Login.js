@@ -24,8 +24,7 @@ export default function Login({ onLogin }) {
       <div className="login-left">
         <div className="login-logo">
           <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" className="company-logo" />
-          <div className="shield-icon" />
-          <div className="login-title">FNL Claims Automation</div>
+          <img src="/images/lock-login.png" alt="Lock" className="lock-icon" />
         </div>
         <div className="login-workbench">Claims Workbench</div>
       </div>

@@ -1,3 +1,12 @@
+.dark-blue-bg {
+  background: #183a5a !important;
+}
+.gold-text {
+  color: #bfa14a !important;
+}
+.white-bg {
+  background: #fff !important;
+}
 .fnol-dashboard {
   display: flex;
   min-height: 100vh;
@@ -5,7 +14,7 @@
 }
 .fnol-sidebar {
   width: 320px;
-  background: #fff;
+  background: #183a5a;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(24,58,90,0.08);
   margin: 32px 0 32px 32px;
@@ -27,17 +36,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f7fafc;
+  background: #25446b;
   border-radius: 8px;
   margin-bottom: 8px;
   padding: 12px 10px;
   cursor: pointer;
   border: 2px solid transparent;
   transition: border 0.2s, background 0.2s;
+  color: #fff;
 }
 .fnol-claim-list li.selected {
-  background: #e9f0fa;
-  border: 2px solid #bfa14a;
+  background: #bfa14a;
+  color: #183a5a;
+  border: 2px solid #fff;
 }
 .fnol-claim-list .claim-title {
   font-weight: 600;
