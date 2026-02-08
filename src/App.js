@@ -1,7 +1,8 @@
 
 
 import React, { useEffect, useState } from 'react';
-import FNOLDashboard from './components/FNOLDashboard';
+import RecentClaims from './components/RecentClaims';
+import ClaimDetails from './components/ClaimDetails';
 import Login from './components/Login';
 import { fetchFNOLs } from './api';
 import './App.css';
@@ -32,17 +33,6 @@ function App() {
     loadFNOLs();
   }, [loggedIn]);
 
-  function deduplicateWorkItems(items) {
-    const seen = new Set();
-    return items.filter(item => {
-      if (item.message_id) {
-        if (seen.has(item.message_id)) return false;
-        seen.add(item.message_id);
-      }
-      return true;
-    });
-  }
-
   if (!loggedIn) {
     return <Login onLogin={() => setLoggedIn(true)} />;
   }
@@ -52,7 +42,6 @@ function App() {
 
   // Show all FNOL work items
   const allClaims = deduplicateWorkItems(workItems);
-
 
   // Sort and filter claims
   let filteredClaims = allClaims.filter(claim => {
@@ -74,44 +63,27 @@ function App() {
   if (!selectedClaim) {
     return (
       <div className="fnol-dashboard dark-blue-bg">
-        <aside className="fnol-sidebar dark-blue-bg">
-          <h2 className="gold-text">Recent Claims</h2>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-            <input
-              type="text"
-              placeholder="Search by ID, subject, status"
-              value={filter}
-              onChange={e => setFilter(e.target.value)}
-              style={{ flex: 1, borderRadius: '8px', padding: '8px', border: '1px solid #bfa14a' }}
-            />
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ borderRadius: '8px', padding: '8px', border: '1px solid #bfa14a' }}>
-              <option value="date">Date</option>
-              <option value="status">Status</option>
-              <option value="priority">Priority</option>
-            </select>
-          </div>
-          <ul className="fnol-claim-list">
-            {filteredClaims.length === 0 ? (
-              <div className="fnol-skeleton" style={{ width: '100%', height: '32px' }} />
-            ) : (
-              filteredClaims.map(claim => (
-                <li
-                  key={claim.id}
-                  className={selectedClaim && claim.id === selectedClaim.id ? 'selected' : ''}
-                  onClick={() => setSelectedClaim(claim)}
-                >
-                  <div>
-                    <div className="claim-title gold-text">Claim #{claim.id}: {claim.email_subject}</div>
-                    <div style={{ fontSize: '0.95rem', color: '#fff' }}>{claim.claim_type || ''}</div>
-                  </div>
-                  <div className={`claim-status ${claim.status ? claim.status.toLowerCase() : ''}`}>{claim.status || 'Status'}</div>
-                </li>
-              ))
-            )}
-          </ul>
-        </aside>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 0' }}>
+          <RecentClaims
+            claims={filteredClaims}
+            onView={setSelectedClaim}
+          />
+        </div>
       </div>
     );
+  }
+
+  // Show extracted fields page when a claim is selected
+  return (
+    <div className="fnol-dashboard dark-blue-bg">
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 0' }}>
+        <ClaimDetails
+          claim={selectedClaim}
+          onBack={() => setSelectedClaim(null)}
+        />
+      </div>
+    </div>
+  );
   }
 
   // Show extracted fields page when a claim is selected
