@@ -84,17 +84,7 @@ function App() {
       </div>
     </div>
   );
-  }
-
-  // Show extracted fields page when a claim is selected
-  return (
-    <FNOLDashboard
-      claims={allClaims}
-      selectedClaim={selectedClaim}
-      onSelectClaim={setSelectedClaim}
-      showProfileDropdown={true}
-    />
-  );
+  // (Remove duplicate/invalid return block)
 }
 
 export default App;
