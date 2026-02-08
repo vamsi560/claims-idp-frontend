@@ -43,14 +43,19 @@
   gap: 32px;
 }
 .claim-info-label {
-  font-size: 1rem;
+  display: block;
+  font-size: 0.98rem;
   color: #1976d2;
   font-weight: 600;
-  margin-right: 8px;
+  margin-bottom: 2px;
+  word-break: break-word;
 }
 .claim-info-value {
+  display: block;
   font-size: 1rem;
   color: #1a2a3a;
+  word-break: break-word;
+  margin-bottom: 2px;
 }
 .claim-details-card {
   background: #fff;
@@ -66,9 +71,10 @@
   margin-bottom: 12px;
 }
 .claim-details-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px 32px;
+  margin-bottom: 8px;
 }
 .claim-attachments-list {
   list-style: none;
@@ -101,13 +107,14 @@
 }
 @media (max-width: 700px) {
   .claim-details-container {
-    padding: 16px 4px;
+    padding: 12px 2px;
     max-width: 100%;
   }
   .claim-details-card, .claim-info-card {
-    padding: 8px 6px;
+    padding: 8px 4px;
   }
   .claim-details-grid {
-    gap: 12px;
+    gap: 8px 8px;
+    grid-template-columns: 1fr;
   }
 }

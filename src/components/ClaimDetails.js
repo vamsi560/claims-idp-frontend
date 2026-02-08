@@ -5,37 +5,19 @@ export default function ClaimDetails({ claim, onBack }) {
   if (!claim) return null;
   return (
     <div className="claim-details-container">
-      <div className="claim-details-header">
-        <span className="claim-details-title">Claim Details - #{claim.id}</span>
-        <button className="back-btn" onClick={onBack}>Back</button>
-      </div>
-      <div className="claim-info-card">
-        <div className="claim-info-row">
-          <div>
-            <span className="claim-info-label">Policy Number</span>
-            <span className="claim-info-value">{claim.extracted_fields?.policy_number || '—'}</span>
-          </div>
-          <div>
-            <span className="claim-info-label">Incident Date</span>
-            <span className="claim-info-value">{claim.extracted_fields?.incident_date || '—'}</span>
-          </div>
-        </div>
-      </div>
       <div className="claim-details-card">
         <div className="claim-details-section-title">Extracted Details</div>
         <div className="claim-details-grid">
-          <div>
-            <span className="claim-info-label">Vehicle Model</span>
-            <span className="claim-info-value">{claim.extracted_fields?.vehicle_model || '—'}</span>
-          </div>
-          <div>
-            <span className="claim-info-label">Damage Description</span>
-            <span className="claim-info-value">{claim.extracted_fields?.damage_description || '—'}</span>
-          </div>
-          <div>
-            <span className="claim-info-label">Estimated Cost</span>
-            <span className="claim-info-value">{claim.extracted_fields?.estimated_cost || '—'}</span>
-          </div>
+          {claim.extracted_fields && Object.keys(claim.extracted_fields).length > 0 ? (
+            Object.entries(claim.extracted_fields).map(([key, value]) => (
+              <div key={key}>
+                <span className="claim-info-label">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                <span className="claim-info-value">{value || '—'}</span>
+              </div>
+            ))
+          ) : (
+            <span className="claim-info-value">No extracted fields</span>
+          )}
         </div>
       </div>
       <div className="claim-details-card">
