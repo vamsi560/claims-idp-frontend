@@ -103,7 +103,7 @@ export default function ClaimDetails({ claim, onBack, onEdit }) {
             >
               Edit
             </button>
-          }
+          )}
         </div>
       </header>
 
