@@ -101,16 +101,44 @@
   line-height: 1.4;
 }
 
-.claim-details-nested {
-  margin: 4px 0 0 0;
-  padding: 10px 12px;
+.claim-details-field--nested-group {
+  grid-column: 1 / -1;
+}
+
+.claim-details-nested-block {
+  margin-top: 6px;
+  padding: 12px 14px;
   background: var(--cw-bg);
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--cw-border);
-  font-size: 0.9rem;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px 20px;
+}
+
+.claim-details-nested-block .claim-details-field {
+  margin-bottom: 0;
+}
+
+.claim-details-nested-list {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.claim-details-nested-list .claim-details-nested-block {
+  margin-top: 0;
+}
+
+.claim-details-inline-nested {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.claim-details-inline-pair {
+  font-size: 0.95rem;
 }
 
 .claim-details-grid {

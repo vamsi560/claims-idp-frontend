@@ -15,26 +15,72 @@ function formatLabel(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
-function formatValue(value) {
+function formatPrimitive(value) {
   if (value == null) return '—';
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-  if (typeof value === 'object') return JSON.stringify(value, null, 2);
+  if (Array.isArray(value)) return value.length ? value.join(', ') : '—';
   return String(value);
 }
 
 function FieldRow({ label, value }) {
-  const display = formatValue(value);
   const isObject = typeof value === 'object' && value !== null && !Array.isArray(value);
+  const isArrayOfObjects = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object';
+
+  if (isArrayOfObjects) {
+    return (
+      <div className="claim-details-field claim-details-field--nested-group">
+        <span className="claim-info-label">{formatLabel(label)}</span>
+        <div className="claim-details-nested-list">
+          {value.map((item, idx) => (
+            <div key={idx} className="claim-details-nested-block">
+              {Object.entries(item).map(([k, v]) => {
+                const isNestedObj = typeof v === 'object' && v !== null && !Array.isArray(v);
+                return (
+                  <div key={k} className="claim-details-field">
+                    <span className="claim-info-label">{formatLabel(k)}</span>
+                    <span className="claim-info-value">
+                      {isNestedObj
+                        ? (
+                          <div className="claim-details-inline-nested">
+                            {Object.entries(v).map(([k2, v2]) => (
+                              <span key={k2} className="claim-details-inline-pair">
+                                {formatLabel(k2)}: {formatPrimitive(v2)}
+                              </span>
+                            ))}
+                          </div>
+                          )
+                        : formatPrimitive(v)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isObject) {
+    return (
+      <div className="claim-details-field claim-details-field--nested-group">
+        <span className="claim-info-label">{formatLabel(label)}</span>
+        <div className="claim-details-nested-block">
+          {Object.entries(value).map(([k, v]) => (
+            <div key={k} className="claim-details-field">
+              <span className="claim-info-label">{formatLabel(k)}</span>
+              <span className="claim-info-value">{formatPrimitive(v)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="claim-details-field">
       <span className="claim-info-label">{formatLabel(label)}</span>
-      <span className="claim-info-value">
-        {isObject ? (
-          <pre className="claim-details-nested">{display}</pre>
-        ) : (
-          display
-        )}
-      </span>
+      <span className="claim-info-value">{formatPrimitive(value)}</span>
     </div>
   );
 }
