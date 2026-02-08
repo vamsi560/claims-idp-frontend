@@ -12,7 +12,9 @@ export default function ClaimDetails({ claim, onBack }) {
             Object.entries(claim.extracted_fields).map(([key, value]) => (
               <div key={key}>
                 <span className="claim-info-label">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
-                <span className="claim-info-value">{value || '—'}</span>
+                <span className="claim-info-value">
+                  {typeof value === 'object' && value !== null ? JSON.stringify(value) : value || '—'}
+                </span>
               </div>
             ))
           ) : (
