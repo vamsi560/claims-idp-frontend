@@ -1,0 +1,32 @@
+/**
+ * Claims Workbench – professional palette
+ * Slate + Teal: authoritative, clean, enterprise-ready
+ */
+:root {
+  /* Primary – nav, sidebar, primary actions */
+  --cw-primary: #1e293b;
+  --cw-primary-hover: #334155;
+  --cw-primary-text: #ffffff;
+
+  /* Accent – links, focus, active, CTAs */
+  --cw-accent: #0d9488;
+  --cw-accent-hover: #0f766e;
+  --cw-accent-text: #ffffff;
+
+  /* Surfaces */
+  --cw-bg: #f8fafc;
+  --cw-surface: #ffffff;
+  --cw-border: #e2e8f0;
+
+  /* Text */
+  --cw-text: #1e293b;
+  --cw-text-muted: #64748b;
+
+  /* Status */
+  --cw-success: #059669;
+  --cw-warning: #d97706;
+  --cw-error: #dc2626;
+
+  /* Focus ring */
+  --cw-focus: #0d9488;
+}

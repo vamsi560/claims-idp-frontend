@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { updateFNOL } from '../api';
 
-function FNOLEdit({ workItem, onBack }) {
+function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
   const [fields, setFields] = useState(workItem.extracted_fields || {});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
-  const handleChange = (e) => {
-    setFields({ ...fields, [e.target.name]: e.target.value });
-  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -18,6 +14,7 @@ function FNOLEdit({ workItem, onBack }) {
     try {
       await updateFNOL(workItem.id, { extracted_fields: fields });
       setSuccess('Changes saved.');
+      if (onSaveSuccess) onSaveSuccess({ id: workItem.id, extracted_fields: fields });
     } catch (err) {
       setError('Failed to save changes.');
     } finally {
@@ -32,6 +29,7 @@ function FNOLEdit({ workItem, onBack }) {
     try {
       await updateFNOL(workItem.id, { extracted_fields: fields, status: 'submitted' });
       setSuccess('FNOL submitted.');
+      if (onSaveSuccess) onSaveSuccess({ id: workItem.id, extracted_fields: fields, status: 'submitted' });
     } catch (err) {
       setError('Failed to submit FNOL.');
     } finally {
@@ -114,12 +112,16 @@ function FNOLEdit({ workItem, onBack }) {
           </form>
         )}
       </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
-      <div style={{ marginTop: '18px' }}>
-        <button onClick={onBack}>Back</button>
-        <button onClick={handleSave} disabled={saving}>Save</button>
-        <button onClick={handleSubmit} disabled={saving}>Submit</button>
+      {error && <p className="fnol-edit-error" role="alert">{error}</p>}
+      {success && <p className="fnol-edit-success" role="status">{success}</p>}
+      <div className="fnol-edit-actions">
+        <button type="button" className="btn btn-secondary" onClick={onBack}>Back</button>
+        <button type="button" className="btn btn-primary" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
+          {saving ? 'Submitting…' : 'Submit'}
+        </button>
       </div>
     </div>
   );

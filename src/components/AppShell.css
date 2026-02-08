@@ -1,0 +1,255 @@
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "topbar topbar"
+    "sidebar main";
+  background: var(--cw-bg);
+}
+
+.app-shell-topbar {
+  grid-area: topbar;
+  height: 56px;
+  background: var(--cw-primary);
+  color: var(--cw-primary-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.app-shell-topbar-left,
+.app-shell-topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.app-shell-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.app-shell-user-wrap {
+  position: relative;
+}
+
+.app-shell-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: var(--cw-primary-text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.app-shell-user-btn:hover {
+  background: var(--cw-primary-hover);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.app-shell-user-btn:focus-visible {
+  outline: 2px solid var(--cw-accent);
+  outline-offset: 2px;
+}
+
+.app-shell-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.app-shell-user-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+}
+
+.app-shell-user-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--cw-surface);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(30, 41, 59, 0.15);
+  padding: 6px 0;
+  z-index: 20;
+  border: 1px solid var(--cw-border);
+}
+
+.app-shell-user-menu-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--cw-text);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.app-shell-user-menu-item:hover {
+  background: var(--cw-bg);
+}
+
+.app-shell-user-menu-item:focus-visible {
+  outline: 2px solid var(--cw-focus);
+  outline-offset: -2px;
+}
+
+.app-shell-sidebar {
+  grid-area: sidebar;
+  width: 280px;
+  background: var(--cw-surface);
+  border-right: 1px solid var(--cw-border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.app-shell-nav {
+  padding: 0 16px 20px;
+  border-bottom: 1px solid var(--cw-border);
+  margin-bottom: 16px;
+}
+
+.app-shell-nav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--cw-text);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.app-shell-nav-item:hover {
+  background: var(--cw-bg);
+  color: var(--cw-accent);
+}
+
+.app-shell-nav-item[aria-current="page"] {
+  background: var(--cw-bg);
+  color: var(--cw-accent);
+}
+
+.app-shell-nav-item:focus-visible {
+  outline: 2px solid var(--cw-focus);
+  outline-offset: 2px;
+}
+
+.app-shell-recent {
+  flex: 1;
+  padding: 0 16px;
+  min-height: 0;
+}
+
+.app-shell-recent-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cw-text-muted);
+  margin: 0 0 10px 0;
+  padding: 0 14px;
+}
+
+.app-shell-recent-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.app-shell-recent-item {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 4px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.app-shell-recent-item:hover {
+  background: var(--cw-bg);
+}
+
+.app-shell-recent-item--active {
+  background: var(--cw-bg);
+  border-left-color: var(--cw-accent);
+  font-weight: 600;
+}
+
+.app-shell-recent-item:focus-visible {
+  outline: 2px solid var(--cw-focus);
+  outline-offset: 2px;
+}
+
+.app-shell-recent-id {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--cw-text-muted);
+  margin-bottom: 2px;
+}
+
+.app-shell-recent-subject {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--cw-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-shell-main {
+  grid-area: main;
+  overflow-y: auto;
+  padding: 24px 32px 48px;
+}
+
+.app-shell-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cw-text);
+  margin: 0 0 20px 0;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    grid-template-areas:
+      "topbar"
+      "main";
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell-sidebar {
+    display: none;
+  }
+
+  .app-shell-main {
+    padding: 16px 20px 32px;
+  }
+}
