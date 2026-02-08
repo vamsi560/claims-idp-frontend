@@ -1,3 +1,14 @@
+  // Deduplicate claims by message_id (or other unique field)
+  function deduplicateWorkItems(items) {
+    const seen = new Set();
+    return items.filter(item => {
+      if (item.message_id) {
+        if (seen.has(item.message_id)) return false;
+        seen.add(item.message_id);
+      }
+      return true;
+    });
+  }
 
 
 import React, { useEffect, useState } from 'react';
