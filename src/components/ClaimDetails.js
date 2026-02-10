@@ -174,7 +174,15 @@ export default function ClaimDetails({ claim, onBack, onEdit }) {
         <ul className="claim-attachments-list">
           {claim.attachments && claim.attachments.length > 0 ? (
             claim.attachments.map((att, idx) => (
-              <li key={idx} className="claim-attachment-item">{att}</li>
+              <li key={att.id || idx} className="claim-attachment-item">
+                <strong>{att.filename}</strong>
+                {att.doc_type && <span style={{ marginLeft: 8, color: '#888' }}>({att.doc_type})</span>}
+                {att.blob_url && (
+                  <a href={att.blob_url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 12 }}>
+                    View
+                  </a>
+                )}
+              </li>
             ))
           ) : (
             <li className="claim-attachment-item">No attachments</li>
