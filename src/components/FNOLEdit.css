@@ -1,17 +1,18 @@
 .fnol-edit {
-  max-width: 720px;
+  max-width: 800px;
 }
 
 .fnol-edit-meta {
   background: var(--cw-surface);
   border: 1px solid var(--cw-border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .fnol-edit-meta-row {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   font-size: 0.95rem;
   color: var(--cw-text);
 }
@@ -23,35 +24,36 @@
 .fnol-edit-sections {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .fnol-edit-section {
   background: var(--cw-surface);
   border: 1px solid var(--cw-border);
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .fnol-edit-section-title {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--cw-accent);
-  margin: 0 0 16px 0;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--cw-border);
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--cw-border);
 }
 
 .fnol-edit-fields {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
 .fnol-edit-field {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 12px;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
   align-items: start;
 }
 
@@ -61,15 +63,15 @@
 
 @media (min-width: 600px) {
   .fnol-edit-field {
-    grid-template-columns: 160px 1fr;
+    grid-template-columns: 180px 1fr;
   }
 }
 
 .fnol-edit-label {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--cw-text);
-  padding-top: 8px;
+  padding-top: 10px;
 }
 
 .fnol-edit-field--top .fnol-edit-label {
@@ -82,49 +84,50 @@
 
 .fnol-edit-input {
   width: 100%;
-  max-width: 400px;
-  padding: 8px 12px;
-  border: 1px solid var(--cw-border);
-  border-radius: 8px;
+  max-width: 500px;
+  padding: 10px 14px;
+  border: 2px solid var(--cw-border);
+  border-radius: 10px;
   font-size: 1rem;
   background: var(--cw-surface);
   color: var(--cw-text);
+  transition: all 0.2s ease;
 }
 
 .fnol-edit-input:focus {
   outline: none;
   border-color: var(--cw-accent);
-  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .fnol-edit-group {
-  padding: 14px 16px;
+  padding: 18px 20px;
   background: var(--cw-bg);
-  border-radius: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--cw-border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 600px;
+}
+
+.fnol-edit-group-inner {
+  padding: 14px 16px;
+  background: var(--cw-surface);
+  border-radius: 10px;
   border: 1px solid var(--cw-border);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 480px;
-}
-
-.fnol-edit-group-inner {
-  padding: 10px 12px;
-  background: var(--cw-surface);
-  border-radius: 6px;
-  border: 1px solid var(--cw-border);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .fnol-edit-group .fnol-edit-field {
-  grid-template-columns: 120px 1fr;
-  gap: 10px;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
 }
 
 .fnol-edit-group .fnol-edit-label {
-  padding-top: 6px;
+  padding-top: 8px;
 }
 
 .fnol-edit-group .fnol-edit-input {
@@ -134,26 +137,28 @@
 .fnol-edit-array {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .fnol-edit-array .fnol-edit-group {
-  max-width: 520px;
+  max-width: 640px;
 }
 
 .fnol-edit-error {
   color: var(--cw-error);
-  margin: 16px 0 0 0;
+  margin: 20px 0 0 0;
+  font-weight: 600;
 }
 
 .fnol-edit-success {
   color: var(--cw-success);
-  margin: 16px 0 0 0;
+  margin: 20px 0 0 0;
+  font-weight: 600;
 }
 
 .fnol-edit-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 24px;
+  gap: 12px;
+  margin-top: 28px;
 }

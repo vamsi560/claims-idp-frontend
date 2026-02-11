@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { updateFNOL } from '../api';
 import './ClaimDetails.css';
 
 const FIELD_SECTIONS = {
@@ -108,6 +109,29 @@ function SectionBlock({ title, entries }) {
 
 export default function ClaimDetails({ claim, onBack, onEdit }) {
   const [showOriginalEmail, setShowOriginalEmail] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  const handleSave = async () => {
+    console.log('=== SAVE BUTTON CLICKED ===');
+    console.log('Claim ID:', claim.id);
+    console.log('API Call: PUT /fnol/' + claim.id + '/');
+    console.log('Payload:', { extracted_fields: claim.extracted_fields });
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      await updateFNOL(claim.id, { extracted_fields: claim.extracted_fields });
+      console.log('Save successful');
+      setSuccess('Changes saved.');
+    } catch (err) {
+      console.error('Save failed:', err);
+      setError('Failed to save changes.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (!claim) return null;
 
@@ -172,9 +196,15 @@ export default function ClaimDetails({ claim, onBack, onEdit }) {
       <div className="claim-details-card">
         <h2 className="claim-details-section-title">Attachments</h2>
         <ul className="claim-attachments-list">
-          {claim.attachments && claim.attachments.length > 0 ? (
+          {Array.isArray(claim.attachments) && claim.attachments.length > 0 ? (
             claim.attachments.map((att, idx) => (
-              <li key={idx} className="claim-attachment-item">{att}</li>
+              typeof att === 'object' && att.id && att.filename && att.blob_url ? (
+                <li key={att.id} className="claim-attachment-item">
+                  <a href={att.blob_url} target="_blank" rel="noopener noreferrer">{att.filename}</a> ({att.doc_type})
+                </li>
+              ) : (
+                <li key={idx} className="claim-attachment-item">{JSON.stringify(att)}</li>
+              )
             ))
           ) : (
             <li className="claim-attachment-item">No attachments</li>
@@ -205,11 +235,24 @@ export default function ClaimDetails({ claim, onBack, onEdit }) {
             </div>
             <div className="claim-details-original-block">
               <span className="claim-info-label">Body</span>
-              <pre className="claim-details-email-body">{claim.email_body || '—'}</pre>
+              <div className="claim-details-email-body" dangerouslySetInnerHTML={{ __html: claim.email_body || '—' }} />
             </div>
           </div>
         )}
       </div>
+      {error && <p className="fnol-edit-error" role="alert">{error}</p>}
+      {success && <p className="fnol-edit-success" role="status">{success}</p>}
+      {onEdit && (
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSave}
+          disabled={saving}
+          style={{ marginTop: '20px' }}
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      )}
     </div>
   );
 }

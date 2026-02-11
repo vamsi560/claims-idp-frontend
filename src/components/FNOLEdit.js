@@ -2,6 +2,21 @@ import React, { useState } from 'react';
 import { updateFNOL } from '../api';
 import './FNOLEdit.css';
 
+const MANDATORY_FIELDS = [
+  { path: 'intent', label: 'Intent Type' },
+  { path: 'policy.policy_number', label: 'Policy Number' },
+  { path: 'policy.line_of_business', label: 'Line of Business' },
+  { path: 'reporting_contact.name', label: 'Reporting Contact Name' },
+  { path: 'reporting_contact.phone_or_email', label: 'Reporting Contact Phone or Email' },
+  { path: 'reporting_contact.relationship_to_insured', label: 'Relationship to Insured' },
+  { path: 'loss.loss_date', label: 'Loss Date' },
+  { path: 'loss.loss_type', label: 'Loss Type' },
+  { path: 'loss.loss_description', label: 'Loss Description' },
+  { path: 'loss.loss_location.city', label: 'Loss Location City' },
+  { path: 'loss.loss_location.state', label: 'Loss Location State' },
+  { path: 'loss.injury_indicator', label: 'Injury Indicator' },
+];
+
 const FIELD_SECTIONS = {
   Summary: ['summary'],
   'Intent & claim type': ['intent', 'reported_by_and_main_contact_are_same', 'claim_type'],
@@ -31,23 +46,71 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [missingFields, setMissingFields] = useState([]);
+
+  const isMandatoryField = (path) => {
+    return MANDATORY_FIELDS.some(f => f.path === path);
+  };
+
+  const isFieldEmpty = (path) => {
+    const keys = path.split('.');
+    let value = fields;
+    for (const key of keys) {
+      value = value?.[key];
+      if (value === undefined || value === null || value === '') return true;
+    }
+    return false;
+  };
 
   const handleSave = async () => {
+    const missingFields = validateMandatoryFields();
+    if (missingFields.length > 0) {
+      setError(`Missing mandatory fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    console.log('=== SAVE BUTTON CLICKED IN EDIT ===');
+    console.log('Work Item ID:', workItem.id);
+    console.log('API Call: PUT /fnol/' + workItem.id + '/');
+    console.log('Payload:', JSON.stringify({ extracted_fields: fields }, null, 2));
     setSaving(true);
     setError(null);
     setSuccess(null);
     try {
       await updateFNOL(workItem.id, { extracted_fields: fields });
+      console.log('Save successful');
       setSuccess('Changes saved.');
       if (onSaveSuccess) onSaveSuccess({ id: workItem.id, extracted_fields: fields });
     } catch (err) {
+      console.error('Save failed:', err);
       setError('Failed to save changes.');
     } finally {
       setSaving(false);
     }
   };
 
+  const validateMandatoryFields = () => {
+    const missing = [];
+    console.log('=== VALIDATING MANDATORY FIELDS ===');
+    MANDATORY_FIELDS.forEach(({ path, label }) => {
+      const isEmpty = isFieldEmpty(path);
+      console.log(`${label} (${path}):`, isEmpty ? 'MISSING ❌' : 'PRESENT ✓');
+      if (isEmpty) {
+        missing.push(label);
+      }
+    });
+    console.log('Total missing fields:', missing.length);
+    setMissingFields(missing.map(label => MANDATORY_FIELDS.find(f => f.label === label).path));
+    return missing;
+  };
+
   const handleSubmit = async () => {
+    const missingFields = validateMandatoryFields();
+    if (missingFields.length > 0) {
+      setError(`Missing mandatory fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
     setSaving(true);
     setError(null);
     setSuccess(null);
@@ -67,6 +130,10 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
   };
 
   const renderValue = (path, value) => {
+    const isMandatory = isMandatoryField(path);
+    const isEmpty = isFieldEmpty(path);
+    const showError = isMandatory && isEmpty && missingFields.includes(path);
+
     if (value == null) {
       return (
         <input
@@ -75,6 +142,7 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
           value=""
           onChange={(e) => updateField(path, e.target.value)}
           placeholder="—"
+          style={showError ? { borderColor: '#ef4444', borderWidth: '2px' } : {}}
         />
       );
     }
@@ -84,6 +152,7 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
           className="fnol-edit-input"
           value={value ? 'true' : 'false'}
           onChange={(e) => updateField(path, e.target.value === 'true')}
+          style={showError ? { borderColor: '#ef4444', borderWidth: '2px' } : {}}
         >
           <option value="true">Yes</option>
           <option value="false">No</option>
@@ -98,6 +167,7 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
             className="fnol-edit-input"
             value={value.join(', ')}
             onChange={(e) => updateField(path, e.target.value.split(',').map((s) => s.trim()))}
+            style={showError ? { borderColor: '#ef4444', borderWidth: '2px' } : {}}
           />
         );
       }
@@ -186,6 +256,7 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
         className="fnol-edit-input"
         value={String(value)}
         onChange={(e) => updateField(path, e.target.value)}
+        style={showError ? { borderColor: '#ef4444', borderWidth: '2px' } : {}}
       />
     );
   };
@@ -213,7 +284,10 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
               <div className="fnol-edit-fields">
                 {keys.map((key) => (
                   <div key={key} className="fnol-edit-field fnol-edit-field--top">
-                    <label className="fnol-edit-label">{formatLabel(key)}</label>
+                    <label className="fnol-edit-label">
+                      {formatLabel(key)}
+                      {isMandatoryField(key) && <span style={{ color: '#ef4444', marginLeft: '4px' }}>*</span>}
+                    </label>
                     <div className="fnol-edit-value">{renderValue(key, fields[key])}</div>
                   </div>
                 ))}
@@ -227,7 +301,10 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
             <div className="fnol-edit-fields">
               {otherKeys.map((key) => (
                 <div key={key} className="fnol-edit-field fnol-edit-field--top">
-                  <label className="fnol-edit-label">{formatLabel(key)}</label>
+                  <label className="fnol-edit-label">
+                    {formatLabel(key)}
+                    {isMandatoryField(key) && <span style={{ color: '#ef4444', marginLeft: '4px' }}>*</span>}
+                  </label>
                   <div className="fnol-edit-value">{renderValue(key, fields[key])}</div>
                 </div>
               ))}

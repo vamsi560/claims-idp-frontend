@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'https://claims-idp-backend-bbe0f4hkckhdcubv.centralus-01.azurewebsites.net'; // Adjust as needed
+const API_BASE = 'https://claims-idp-backend-bbe0f4hkckhdcubv.centralus-01.azurewebsites.net';
 
 export async function fetchFNOLs() {
   const res = await axios.get(`${API_BASE}/fnol/`);

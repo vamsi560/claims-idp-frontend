@@ -81,7 +81,18 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
         )}
         {activeTab === 'Attachments' && selectedClaim && (
           <div style={{ marginBottom: '24px' }}>
-            <strong>Attachments:</strong> {selectedClaim.attachments?.length ? selectedClaim.attachments.join(', ') : '—'}
+            <strong>Attachments:</strong>
+            {Array.isArray(selectedClaim.attachments) && selectedClaim.attachments.length ? (
+              <ul>
+                {selectedClaim.attachments.map(att => (
+                  typeof att === 'object' && att.id && att.filename && att.blob_url ? (
+                    <li key={att.id}>
+                      <a href={att.blob_url} target="_blank" rel="noopener noreferrer">{att.filename}</a> ({att.doc_type})
+                    </li>
+                  ) : null
+                ))}
+              </ul>
+            ) : '—'}
           </div>
         )}
         {/* No View Original Email button, replaced by Save/Submit */}

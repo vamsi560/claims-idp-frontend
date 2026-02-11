@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import RecentClaims from './components/RecentClaims';
 import ClaimDetails from './components/ClaimDetails';
@@ -20,14 +21,33 @@ function deduplicateWorkItems(items) {
 }
 
 function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+}
+
+function AppContent() {
+  const navigate = useNavigate();
   const [workItems, setWorkItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedClaim, setSelectedClaim] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem('loggedIn') === 'true');
   const [sortBy, setSortBy] = useState('date');
   const [filter, setFilter] = useState('');
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+    localStorage.setItem('loggedIn', 'true');
+    navigate('/');
+  };
+
+  const handleLogout = () => {
+    setLoggedIn(false);
+    localStorage.removeItem('loggedIn');
+    navigate('/login');
+  };
 
   const loadFNOLs = async () => {
     setLoading(true);
@@ -46,10 +66,6 @@ function App() {
     if (!loggedIn) return;
     loadFNOLs();
   }, [loggedIn]);
-
-  if (!loggedIn) {
-    return <Login onLogin={() => setLoggedIn(true)} />;
-  }
 
   const allClaims = deduplicateWorkItems(workItems);
   const recentClaimsForSidebar = [...allClaims]
@@ -70,76 +86,93 @@ function App() {
     filteredClaims = [...filteredClaims].sort((a, b) => a.id - b.id);
   }
 
-  const handleBackFromDetails = () => {
-    setSelectedClaim(null);
-    setEditMode(false);
-  };
+  return (
+    <Routes>
+      <Route path="/login" element={<Login onLogin={handleLogin} />} />
+      <Route path="/" element={
+        loggedIn ? (
+          <AppShell
+            pageTitle="Recent Claims"
+            recentClaims={recentClaimsForSidebar}
+            selectedClaim={null}
+            onSelectClaim={(claim) => navigate(`/claims/${claim.id}`)}
+            onGoToClaims={() => navigate('/')}
+            onSignOut={handleLogout}
+          >
+            {loading ? <ClaimsTableSkeleton /> : error ? (
+              <div className="app-error-state" role="alert">
+                <p className="app-error-message">{error}</p>
+                <button type="button" className="btn btn-primary" onClick={loadFNOLs}>Try again</button>
+              </div>
+            ) : (
+              <RecentClaims
+                claims={filteredClaims}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                filter={filter}
+                setFilter={setFilter}
+                onView={(claim) => navigate(`/claims/${claim.id}`)}
+              />
+            )}
+          </AppShell>
+        ) : <Navigate to="/login" />
+      } />
+      <Route path="/claims/:id" element={<ClaimDetailsRoute allClaims={allClaims} recentClaims={recentClaimsForSidebar} loggedIn={loggedIn} onSignOut={handleLogout} />} />
+      <Route path="/claims/:id/edit" element={<ClaimEditRoute allClaims={allClaims} recentClaims={recentClaimsForSidebar} loggedIn={loggedIn} onSignOut={handleLogout} />} />
+    </Routes>
+  );
+}
 
-  const handleSaveSuccess = (updated) => {
-    setSelectedClaim(prev => prev && prev.id === updated.id ? { ...prev, ...updated } : prev);
-  };
+function ClaimDetailsRoute({ allClaims, recentClaims, loggedIn, onSignOut }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const claim = allClaims.find(c => c.id === parseInt(id));
 
-  const getPageTitle = () => {
-    if (editMode && selectedClaim) return 'Edit claim';
-    if (selectedClaim) return `Claim #${selectedClaim.id}`;
-    return 'Recent Claims';
-  };
-
-  const mainContent = () => {
-    if (loading) {
-      return <ClaimsTableSkeleton />;
-    }
-    if (error) {
-      return (
-        <div className="app-error-state" role="alert">
-          <p className="app-error-message">{error}</p>
-          <button type="button" className="btn btn-primary" onClick={loadFNOLs}>Try again</button>
-        </div>
-      );
-    }
-    if (!selectedClaim) {
-      return (
-        <RecentClaims
-          claims={filteredClaims}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          filter={filter}
-          setFilter={setFilter}
-          onView={setSelectedClaim}
-        />
-      );
-    }
-    if (editMode) {
-      return (
-        <FNOLEdit
-          workItem={selectedClaim}
-          onBack={() => setEditMode(false)}
-          onSaveSuccess={handleSaveSuccess}
-        />
-      );
-    }
-    return (
-      <ClaimDetails
-        claim={selectedClaim}
-        onBack={handleBackFromDetails}
-        onEdit={() => setEditMode(true)}
-      />
-    );
-  };
+  if (!loggedIn) return <Navigate to="/login" />;
+  if (allClaims.length === 0) return <ClaimsTableSkeleton />;
+  if (!claim) return <Navigate to="/" />;
 
   return (
     <AppShell
-      pageTitle={getPageTitle()}
-      recentClaims={recentClaimsForSidebar}
-      selectedClaim={selectedClaim}
-      onSelectClaim={(claim) => {
-        setSelectedClaim(claim);
-        setEditMode(false);
-      }}
-      onGoToClaims={handleBackFromDetails}
-      onSignOut={() => setLoggedIn(false)}
+      pageTitle={`Claim #${claim.id}`}
+      recentClaims={recentClaims}
+      selectedClaim={claim}
+      onSelectClaim={(c) => navigate(`/claims/${c.id}`)}
+      onGoToClaims={() => navigate('/')}
+      onSignOut={onSignOut}
     >
-      {mainContent()}
+      <ClaimDetails
+        claim={claim}
+        onBack={() => navigate('/')}
+        onEdit={() => navigate(`/claims/${claim.id}/edit`)}
+      />
+    </AppShell>
+  );
+}
+
+function ClaimEditRoute({ allClaims, recentClaims, loggedIn, onSignOut }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const claim = allClaims.find(c => c.id === parseInt(id));
+
+  if (!loggedIn) return <Navigate to="/login" />;
+  if (allClaims.length === 0) return <ClaimsTableSkeleton />;
+  if (!claim) return <Navigate to="/" />;
+
+  return (
+    <AppShell
+      pageTitle="Edit claim"
+      recentClaims={recentClaims}
+      selectedClaim={claim}
+      onSelectClaim={(c) => navigate(`/claims/${c.id}`)}
+      onGoToClaims={() => navigate('/')}
+      onSignOut={onSignOut}
+    >
+      <FNOLEdit
+        workItem={claim}
+        onBack={() => navigate(`/claims/${claim.id}`)}
+        onSaveSuccess={() => navigate(`/claims/${claim.id}`)}
+      />
     </AppShell>
   );
 }
