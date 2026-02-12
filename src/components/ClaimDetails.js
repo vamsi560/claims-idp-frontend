@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { updateFNOL } from '../api';
 import './ClaimDetails.css';
+import AttachmentViewer from './AttachmentViewer';
 
 const FIELD_SECTIONS = {
   Summary: ['summary'],
@@ -195,21 +197,7 @@ export default function ClaimDetails({ claim, onBack, onEdit }) {
 
       <div className="claim-details-card">
         <h2 className="claim-details-section-title">Attachments</h2>
-        <ul className="claim-attachments-list">
-          {Array.isArray(claim.attachments) && claim.attachments.length > 0 ? (
-            claim.attachments.map((att, idx) => (
-              typeof att === 'object' && att.id && att.filename && att.blob_url ? (
-                <li key={att.id} className="claim-attachment-item">
-                  <a href={att.blob_url} target="_blank" rel="noopener noreferrer">{att.filename}</a> ({att.doc_type})
-                </li>
-              ) : (
-                <li key={idx} className="claim-attachment-item">{JSON.stringify(att)}</li>
-              )
-            ))
-          ) : (
-            <li className="claim-attachment-item">No attachments</li>
-          )}
-        </ul>
+        <AttachmentViewer attachments={claim.attachments} />
       </div>
 
       <div className="claim-details-original">

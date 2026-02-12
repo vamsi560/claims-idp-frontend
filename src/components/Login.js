@@ -27,7 +27,7 @@ export default function Login({ onLogin }) {
         <div className="login-brand-header">
           <img src="/images/lock-login.png" alt="Lock Login" className="login-shield-image" />
         </div>
-        <div className="login-secure-text">Claims Work Bench</div>
+        <div className="login-secure-text">Claims Workbench</div>
           <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" className="login-vm-logo" />
       </div>
       <div className="login-split login-split-right">
