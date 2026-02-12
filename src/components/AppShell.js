@@ -10,7 +10,8 @@ export default function AppShell({ children, pageTitle, recentClaims = [], selec
   return (
     <div className="app-shell">
       <header className="app-shell-topbar" role="banner">
-        <div className="app-shell-topbar-left">
+        <div className="app-shell-topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+          <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" style={{ height: 40, width: 'auto' }} />
           <span className="app-shell-brand">Claims Workbench</span>
         </div>
         <div className="app-shell-topbar-right">
