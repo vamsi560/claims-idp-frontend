@@ -140,12 +140,12 @@ function ClaimDetailsRoute({ allClaims, recentClaims, loggedIn, onSignOut }) {
       recentClaims={recentClaims}
       selectedClaim={claim}
       onSelectClaim={(c) => navigate(`/claims/${c.id}`)}
-      onGoToClaims={() => navigate('/')}
+      onGoToClaims={() => navigate('/home')}
       onSignOut={onSignOut}
     >
       <ClaimDetails
         claim={claim}
-        onBack={() => navigate('/')}
+        onBack={() => navigate('/home')}
         onEdit={() => navigate(`/claims/${claim.id}/edit`)}
       />
     </AppShell>
