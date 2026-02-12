@@ -37,16 +37,18 @@ function AppContent() {
   const [sortBy, setSortBy] = useState('date');
   const [filter, setFilter] = useState('');
 
+
   const handleLogin = () => {
     setLoggedIn(true);
     localStorage.setItem('loggedIn', 'true');
-    navigate('/');
+    navigate('/home');
   };
+
 
   const handleLogout = () => {
     setLoggedIn(false);
     localStorage.removeItem('loggedIn');
-    navigate('/login');
+    navigate('/');
   };
 
   const loadFNOLs = async () => {
@@ -88,15 +90,15 @@ function AppContent() {
 
   return (
     <Routes>
-      <Route path="/login" element={<Login onLogin={handleLogin} />} />
-      <Route path="/" element={
+      <Route path="/" element={<Login onLogin={handleLogin} />} />
+      <Route path="/home" element={
         loggedIn ? (
           <AppShell
             pageTitle="Recent Claims"
             recentClaims={recentClaimsForSidebar}
             selectedClaim={null}
             onSelectClaim={(claim) => navigate(`/claims/${claim.id}`)}
-            onGoToClaims={() => navigate('/')}
+            onGoToClaims={() => navigate('/home')}
             onSignOut={handleLogout}
           >
             {loading ? <ClaimsTableSkeleton /> : error ? (
@@ -115,7 +117,7 @@ function AppContent() {
               />
             )}
           </AppShell>
-        ) : <Navigate to="/login" />
+        ) : <Navigate to="/" />
       } />
       <Route path="/claims/:id" element={<ClaimDetailsRoute allClaims={allClaims} recentClaims={recentClaimsForSidebar} loggedIn={loggedIn} onSignOut={handleLogout} />} />
       <Route path="/claims/:id/edit" element={<ClaimEditRoute allClaims={allClaims} recentClaims={recentClaimsForSidebar} loggedIn={loggedIn} onSignOut={handleLogout} />} />
