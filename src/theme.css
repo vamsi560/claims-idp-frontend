@@ -1,6 +1,6 @@
 :root {
   --cw-primary: #1e293b;
-  --cw-primary-hover: #334155;
+  --cw-primary-hover: hsl(215, 38%, 38%);
   --cw-primary-text: #ffffff;
   --cw-accent: #0d9488;
   --cw-accent-hover: #0f766e;
@@ -8,8 +8,8 @@
   --cw-bg: #f8fafc;
   --cw-surface: #ffffff;
   --cw-border: #e2e8f0;
-  --cw-text: #1e293b;
-  --cw-text-muted: #64748b;
+  --cw-text: #4d668e;
+  --cw-text-muted: #3e516c;
   --cw-success: #059669;
   --cw-warning: #d97706;
   --cw-error: #dc2626;
