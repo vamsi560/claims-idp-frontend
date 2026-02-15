@@ -38,6 +38,8 @@ function renderExtractedFields(fields) {
 
 export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) {
   const [activeTab, setActiveTab] = useState('Analytics');
+  // Safe default for onSelectClaim
+  const handleSelectClaim = onSelectClaim && typeof onSelectClaim === 'function' ? onSelectClaim : () => {};
   const [summary, setSummary] = useState(null);
   const [trend, setTrend] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,42 +72,25 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
   const trendCounts = trend.map(t => t.count);
 
   return (
-    <div className="fnol-dashboard dark-blue-bg">
-      <aside className="fnol-sidebar dark-blue-bg">
-        <h2 className="gold-text">Recent Claims</h2>
-        <ul className="fnol-claim-list">
-          {claims.map(claim => (
-            <li
-              key={claim.id}
-              className={selectedClaim && claim.id === selectedClaim.id ? 'selected' : ''}
-              onClick={() => onSelectClaim(claim)}
-            >
-              <div>
-                <div className="claim-title gold-text">Claim #{claim.id}: {claim.email_subject}</div>
-                <div style={{ fontSize: '0.95rem', color: '#fff' }}>{claim.claim_type || ''}</div>
-              </div>
-              <div className={`claim-status ${claim.status ? claim.status.toLowerCase() : ''}`}>{claim.status || 'Status'}</div>
-            </li>
-          ))}
-        </ul>
-      </aside>
+    <div className="fnol-dashboard teal-bg">
       <main className="fnol-main white-bg">
         <div className="fnol-header">
-          <div className="fnol-title gold-text">{activeTab === 'Analytics' ? 'Claims Analytics' : `Claim Details - #${selectedClaim ? selectedClaim.id : ''}`}</div>
+          <div className="fnol-title teal-text">{activeTab === 'Analytics' ? 'Claims Analytics' : `Claim Details - #${selectedClaim ? selectedClaim.id : ''}`}</div>
           <div className="fnol-profile">
             <div className="fnol-profile-icon" />
             <div className="fnol-profile-name">Joan profile</div>
           </div>
         </div>
-        <div className="fnol-tabs">
-          {tabs.map(tab => (
-            <div
-              key={tab}
-              className={`fnol-tab${activeTab === tab ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >{tab}</div>
-          ))}
-        </div>
+          <div className="fnol-tabs">
+            {tabs.map(tab => (
+              <div
+                key={tab}
+                className={`fnol-tab${activeTab === tab ? ' active' : ''}`}
+                onClick={() => setActiveTab(tab)}
+                style={{ color: activeTab === tab ? '#009688' : '#183a5a', borderBottom: activeTab === tab ? '2px solid #009688' : '2px solid transparent' }}
+              >{tab}</div>
+            ))}
+          </div>
         {activeTab === 'Analytics' && (
           <div style={{ margin: '24px 0' }}>
             {loading ? <div>Loading analytics...</div> : summary && (
@@ -118,7 +103,7 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
                         labels: statusLabels,
                         datasets: [{
                           data: statusCounts,
-                          backgroundColor: ['#bfa14a', '#183a5a', '#25446b', '#e0e0e0', '#f4b942', '#6c757d'],
+                          backgroundColor: ['#009688', '#4dd0e1', '#80cbc4', '#e0e0e0', '#b2dfdb', '#26a69a'],
                         }]
                       }}
                     />
@@ -131,18 +116,18 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
                         datasets: [{
                           label: 'Count',
                           data: typeCounts,
-                          backgroundColor: '#183a5a',
+                          backgroundColor: '#009688',
                         }]
                       }}
                       options={{
                         plugins: { legend: { display: false } },
-                        scales: { x: { ticks: { color: '#183a5a' } }, y: { beginAtZero: true } }
+                        scales: { x: { ticks: { color: '#009688' } }, y: { beginAtZero: true } }
                       }}
                     />
                   </div>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 18 }}>Avg. Processing Time</div>
-                    <div style={{ fontSize: 32, color: '#bfa14a', fontWeight: 700 }}>
+                    <div style={{ fontSize: 32, color: '#009688', fontWeight: 700 }}>
                       {Math.round((summary.average_processing_time_seconds || 0) / 3600 * 10) / 10} hrs
                     </div>
                   </div>
@@ -155,14 +140,14 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
                       datasets: [{
                         label: 'Claims',
                         data: trendCounts,
-                        borderColor: '#bfa14a',
-                        backgroundColor: 'rgba(191,161,74,0.2)',
+                        borderColor: '#009688',
+                        backgroundColor: 'rgba(0,150,136,0.15)',
                         tension: 0.3
                       }]
                     }}
                     options={{
                       plugins: { legend: { display: false } },
-                      scales: { x: { ticks: { color: '#183a5a' } }, y: { beginAtZero: true } }
+                      scales: { x: { ticks: { color: '#009688' } }, y: { beginAtZero: true } }
                     }}
                   />
                 </div>
@@ -174,8 +159,8 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
           <>
             {renderExtractedFields(selectedClaim.extracted_fields)}
             <div style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
-              <button className="fnol-view-email-btn">Save</button>
-              <button className="fnol-view-email-btn">Submit</button>
+              <button className="fnol-view-email-btn teal-btn">Save</button>
+              <button className="fnol-view-email-btn teal-btn">Submit</button>
             </div>
           </>
         )}
