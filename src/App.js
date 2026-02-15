@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
-import AppShell from './components/AppShell';
+import MainLayout from './components/MainLayout';
+import DashboardPage from './components/DashboardPage';
 import RecentClaims from './components/RecentClaims';
 import ClaimDetails from './components/ClaimDetails';
 import FNOLEdit from './components/FNOLEdit';
@@ -36,14 +37,13 @@ function AppContent() {
   const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem('loggedIn') === 'true');
   const [sortBy, setSortBy] = useState('date');
   const [filter, setFilter] = useState('');
-
+  const [activePage, setActivePage] = useState('dashboard');
 
   const handleLogin = () => {
     setLoggedIn(true);
     localStorage.setItem('loggedIn', 'true');
-    navigate('/home');
+    navigate('/dashboard');
   };
-
 
   const handleLogout = () => {
     setLoggedIn(false);
@@ -91,16 +91,23 @@ function AppContent() {
   return (
     <Routes>
       <Route path="/" element={<Login onLogin={handleLogin} />} />
-      <Route path="/home" element={
+      <Route path="/dashboard" element={
         loggedIn ? (
-          <AppShell
-            pageTitle="Recent Claims"
-            recentClaims={recentClaimsForSidebar}
-            selectedClaim={null}
-            onSelectClaim={(claim) => navigate(`/claims/${claim.id}`)}
-            onGoToClaims={() => navigate('/home')}
-            onSignOut={handleLogout}
-          >
+          <MainLayout activePage="dashboard" onNavigate={setActivePage}>
+            {loading ? <ClaimsTableSkeleton /> : error ? (
+              <div className="app-error-state" role="alert">
+                <p className="app-error-message">{error}</p>
+                <button type="button" className="btn btn-primary" onClick={loadFNOLs}>Try again</button>
+              </div>
+            ) : (
+              <DashboardPage claims={allClaims} />
+            )}
+          </MainLayout>
+        ) : <Navigate to="/" />
+      } />
+      <Route path="/claims" element={
+        loggedIn ? (
+          <MainLayout activePage="claims" onNavigate={setActivePage}>
             {loading ? <ClaimsTableSkeleton /> : error ? (
               <div className="app-error-state" role="alert">
                 <p className="app-error-message">{error}</p>
@@ -116,7 +123,7 @@ function AppContent() {
                 onView={(claim) => navigate(`/claims/${claim.id}`)}
               />
             )}
-          </AppShell>
+          </MainLayout>
         ) : <Navigate to="/" />
       } />
       <Route path="/claims/:id" element={<ClaimDetailsRoute allClaims={allClaims} recentClaims={recentClaimsForSidebar} loggedIn={loggedIn} onSignOut={handleLogout} />} />

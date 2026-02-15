@@ -1,0 +1,11 @@
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f6fa;
+}
+.main-layout-content {
+  flex: 1;
+  padding: 0;
+  background: #fff;
+  min-height: 100vh;
+}
