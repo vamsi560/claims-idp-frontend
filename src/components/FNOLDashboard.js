@@ -19,6 +19,7 @@ import {
 } from 'chart.js';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend);
 import './FNOLDashboard.css';
+import VMLogo from './VMLogo';
 
 const tabs = ['Analytics', 'Summary', 'Email Source', 'Extracted Data', 'Attachments'];
 
@@ -72,9 +73,13 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
   const trendCounts = trend.map(t => t.count);
 
   return (
-    <div className="fnol-dashboard teal-bg">
+    <div className="fnol-dashboard white-bg">
       <main className="fnol-main white-bg">
-        <div className="fnol-header">
+        <div className="fnol-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <VMLogo style={{ width: 40, height: 40 }} />
+            <span style={{ fontWeight: 700, fontSize: 24, color: '#222' }}>Claims Workbench</span>
+          </div>
           <div className="fnol-title teal-text">{activeTab === 'Analytics' ? 'Claims Analytics' : `Claim Details - #${selectedClaim ? selectedClaim.id : ''}`}</div>
           <div className="fnol-profile">
             <div className="fnol-profile-icon" />
