@@ -1,6 +1,6 @@
 .sidebar-nav {
   width: 220px;
-  background: #183a5a;
+  background: #009688;
   padding: 32px 0 0 0;
   min-height: 100vh;
   display: flex;
@@ -20,7 +20,7 @@
   transition: background 0.2s, color 0.2s;
 }
 .sidebar-link.active, .sidebar-link:hover {
-  background: #bfa14a;
-  color: #183a5a;
+  background: #fff;
+  color: #009688;
   font-weight: bold;
 }

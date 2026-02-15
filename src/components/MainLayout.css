@@ -1,7 +1,7 @@
 .main-layout {
   display: flex;
   min-height: 100vh;
-  background: #f4f6fa;
+  background: #f8f9fa;
 }
 .main-layout-content {
   flex: 1;

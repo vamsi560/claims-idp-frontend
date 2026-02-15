@@ -142,20 +142,13 @@ function ClaimDetailsRoute({ allClaims, recentClaims, loggedIn, onSignOut }) {
   if (!claim) return <Navigate to="/" />;
 
   return (
-    <AppShell
-      pageTitle={`Claim #${claim.id}`}
-      recentClaims={recentClaims}
-      selectedClaim={claim}
-      onSelectClaim={(c) => navigate(`/claims/${c.id}`)}
-      onGoToClaims={() => navigate('/home')}
-      onSignOut={onSignOut}
-    >
+    <MainLayout activePage="claims" onNavigate={(page) => navigate(page === 'dashboard' ? '/dashboard' : '/claims')}>
       <ClaimDetails
         claim={claim}
         onBack={() => navigate('/home')}
         onEdit={() => navigate(`/claims/${claim.id}/edit`)}
       />
-    </AppShell>
+    </MainLayout>
   );
 }
 
@@ -169,20 +162,13 @@ function ClaimEditRoute({ allClaims, recentClaims, loggedIn, onSignOut }) {
   if (!claim) return <Navigate to="/" />;
 
   return (
-    <AppShell
-      pageTitle="Edit claim"
-      recentClaims={recentClaims}
-      selectedClaim={claim}
-      onSelectClaim={(c) => navigate(`/claims/${c.id}`)}
-      onGoToClaims={() => navigate('/')}
-      onSignOut={onSignOut}
-    >
+    <MainLayout activePage="claims" onNavigate={(page) => navigate(page === 'dashboard' ? '/dashboard' : '/claims')}>
       <FNOLEdit
         workItem={claim}
         onBack={() => navigate(`/claims/${claim.id}`)}
         onSaveSuccess={() => navigate(`/claims/${claim.id}`)}
       />
-    </AppShell>
+    </MainLayout>
   );
 }
 
