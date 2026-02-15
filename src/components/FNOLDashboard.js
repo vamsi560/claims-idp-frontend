@@ -1,8 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchClaimsSummary, fetchClaimsTrend } from '../api';
+import {
+  Bar,
+  Pie,
+  Line
+} from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend
+} from 'chart.js';
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend);
 import './FNOLDashboard.css';
 
-const tabs = ['Summary', 'Email Source', 'Extracted Data', 'Attachments'];
+const tabs = ['Analytics', 'Summary', 'Email Source', 'Extracted Data', 'Attachments'];
 
 function renderExtractedFields(fields) {
   if (!fields || typeof fields !== 'object') return <div>No extracted fields.</div>;
@@ -19,7 +37,37 @@ function renderExtractedFields(fields) {
 }
 
 export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) {
-  const [activeTab, setActiveTab] = useState('Extracted Data');
+  const [activeTab, setActiveTab] = useState('Analytics');
+  const [summary, setSummary] = useState(null);
+  const [trend, setTrend] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadAnalytics() {
+      setLoading(true);
+      try {
+        const [summaryData, trendData] = await Promise.all([
+          fetchClaimsSummary(),
+          fetchClaimsTrend(30)
+        ]);
+        setSummary(summaryData);
+        setTrend(trendData);
+      } catch (e) {
+        setSummary(null);
+        setTrend([]);
+      }
+      setLoading(false);
+    }
+    if (activeTab === 'Analytics') loadAnalytics();
+  }, [activeTab]);
+
+  // Prepare chart data
+  const statusLabels = summary ? Object.keys(summary.claims_by_status || {}) : [];
+  const statusCounts = summary ? Object.values(summary.claims_by_status || {}) : [];
+  const typeLabels = summary ? Object.keys(summary.claims_by_type || {}) : [];
+  const typeCounts = summary ? Object.values(summary.claims_by_type || {}) : [];
+  const trendLabels = trend.map(t => t.date);
+  const trendCounts = trend.map(t => t.count);
 
   return (
     <div className="fnol-dashboard dark-blue-bg">
@@ -43,7 +91,7 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
       </aside>
       <main className="fnol-main white-bg">
         <div className="fnol-header">
-          <div className="fnol-title gold-text">Claim Details - #{selectedClaim ? selectedClaim.id : ''}</div>
+          <div className="fnol-title gold-text">{activeTab === 'Analytics' ? 'Claims Analytics' : `Claim Details - #${selectedClaim ? selectedClaim.id : ''}`}</div>
           <div className="fnol-profile">
             <div className="fnol-profile-icon" />
             <div className="fnol-profile-name">Joan profile</div>
@@ -58,6 +106,70 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
             >{tab}</div>
           ))}
         </div>
+        {activeTab === 'Analytics' && (
+          <div style={{ margin: '24px 0' }}>
+            {loading ? <div>Loading analytics...</div> : summary && (
+              <>
+                <div style={{ display: 'flex', gap: '32px', marginBottom: 32 }}>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 18 }}>Claims by Status</div>
+                    <Pie
+                      data={{
+                        labels: statusLabels,
+                        datasets: [{
+                          data: statusCounts,
+                          backgroundColor: ['#bfa14a', '#183a5a', '#25446b', '#e0e0e0', '#f4b942', '#6c757d'],
+                        }]
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 18 }}>Claims by Type</div>
+                    <Bar
+                      data={{
+                        labels: typeLabels,
+                        datasets: [{
+                          label: 'Count',
+                          data: typeCounts,
+                          backgroundColor: '#183a5a',
+                        }]
+                      }}
+                      options={{
+                        plugins: { legend: { display: false } },
+                        scales: { x: { ticks: { color: '#183a5a' } }, y: { beginAtZero: true } }
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 18 }}>Avg. Processing Time</div>
+                    <div style={{ fontSize: 32, color: '#bfa14a', fontWeight: 700 }}>
+                      {Math.round((summary.average_processing_time_seconds || 0) / 3600 * 10) / 10} hrs
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 8 }}>Claims Trend (Last 30 Days)</div>
+                  <Line
+                    data={{
+                      labels: trendLabels,
+                      datasets: [{
+                        label: 'Claims',
+                        data: trendCounts,
+                        borderColor: '#bfa14a',
+                        backgroundColor: 'rgba(191,161,74,0.2)',
+                        tension: 0.3
+                      }]
+                    }}
+                    options={{
+                      plugins: { legend: { display: false } },
+                      scales: { x: { ticks: { color: '#183a5a' } }, y: { beginAtZero: true } }
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )}
         {activeTab === 'Extracted Data' && selectedClaim && (
           <>
             {renderExtractedFields(selectedClaim.extracted_fields)}

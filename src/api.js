@@ -1,3 +1,13 @@
+
+export async function fetchClaimsSummary() {
+  const res = await axios.get(`${API_BASE}/analytics/claims-summary`);
+  return res.data;
+}
+
+export async function fetchClaimsTrend(days = 30) {
+  const res = await axios.get(`${API_BASE}/analytics/claims-trend?days=${days}`);
+  return res.data;
+}
 import axios from 'axios';
 
 const API_BASE = 'https://claims-idp-backend-bbe0f4hkckhdcubv.centralus-01.azurewebsites.net';
