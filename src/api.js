@@ -11,7 +11,7 @@ export async function fetchClaimsTrend(days = 30) {
 }
 import axios from "axios";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://claims-idp-backend-bbe0f4hkckhdcubv.centralus-01.azurewebsites.net";
 
 export async function fetchFNOLs() {
   const res = await axios.get(`${API_BASE}/fnol/`);
