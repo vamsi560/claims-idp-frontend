@@ -1,16 +1,17 @@
-
 export async function fetchClaimsSummary() {
   const res = await axios.get(`${API_BASE}/analytics/claims-summary`);
   return res.data;
 }
 
 export async function fetchClaimsTrend(days = 30) {
-  const res = await axios.get(`${API_BASE}/analytics/claims-trend?days=${days}`);
+  const res = await axios.get(
+    `${API_BASE}/analytics/claims-trend?days=${days}`,
+  );
   return res.data;
 }
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE = 'https://claims-idp-backend-bbe0f4hkckhdcubv.centralus-01.azurewebsites.net';
+const API_BASE = "http://127.0.0.1:8000";
 
 export async function fetchFNOLs() {
   const res = await axios.get(`${API_BASE}/fnol/`);
@@ -24,8 +25,8 @@ export async function submitFNOL(data) {
 
 export async function uploadAttachment(workitemId, file) {
   const formData = new FormData();
-  formData.append('file', file);
-  formData.append('workitem_id', workitemId);
+  formData.append("file", file);
+  formData.append("workitem_id", workitemId);
   const res = await axios.post(`${API_BASE}/attachments/`, formData);
   return res.data;
 }

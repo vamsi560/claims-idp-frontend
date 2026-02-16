@@ -5,6 +5,7 @@ const RECENT_CLAIMS_LIMIT = 10;
 
 export default function AppShell({ children, pageTitle, recentClaims = [], selectedClaim, onSelectClaim, onGoToClaims, onSignOut }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const recent = recentClaims.slice(0, RECENT_CLAIMS_LIMIT);
 
   return (
@@ -53,8 +54,20 @@ export default function AppShell({ children, pageTitle, recentClaims = [], selec
         </div>
       </header>
 
-      <aside className="app-shell-sidebar" aria-label="Navigation">
-        <nav className="app-shell-nav">
+      <aside className={`app-shell-sidebar${sidebarCollapsed ? ' collapsed' : ''}`} aria-label="Navigation">
+        <button
+          className="app-shell-sidebar-toggle"
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          onClick={() => setSidebarCollapsed((v) => !v)}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect y="4" width="24" height="2.5" rx="1.25" fill="#111" />
+            <rect y="10.75" width="24" height="2.5" rx="1.25" fill="#111" />
+            <rect y="17.5" width="24" height="2.5" rx="1.25" fill="#111" />
+          </svg>
+        </button>
+        {!sidebarCollapsed && (
+          <nav className="app-shell-nav">
           <button
             type="button"
             className="app-shell-nav-item app-shell-nav-item--active"
@@ -64,7 +77,8 @@ export default function AppShell({ children, pageTitle, recentClaims = [], selec
             Claims
           </button>
         </nav>
-        {recent.length > 0 && (
+        )}
+        {!sidebarCollapsed && recent.length > 0 && (
           <div className="app-shell-recent">
             <h2 className="app-shell-recent-title">Recent</h2>
             <ul className="app-shell-recent-list" role="list">

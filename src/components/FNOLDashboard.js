@@ -73,19 +73,19 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
 
   return (
     <div className="fnol-dashboard white-bg">
-      <main className="fnol-main white-bg">
-        <div className="fnol-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" style={{ width: 40, height: 40 }} />
-            <span style={{ fontWeight: 700, fontSize: 24, color: '#222' }}>Claims Workbench</span>
-          </div>
-          <div className="fnol-title teal-text">{activeTab === 'Analytics' ? 'Claims Analytics' : `Claim Details - #${selectedClaim ? selectedClaim.id : ''}`}</div>
-          <div className="fnol-profile">
-            <div className="fnol-profile-icon" />
-            <div className="fnol-profile-name">Joan profile</div>
-          </div>
+      <header className="fnol-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" style={{ width: 100, height: 40, marginLeft: '10px' }} />
+          <span style={{ fontWeight: 700, fontSize: 24, color: '#222' }}>Claims Workbench</span>
         </div>
-          <div className="fnol-tabs">
+        <div className="fnol-title teal-text">{activeTab === 'Analytics' ? 'Claims Analytics' : `Claim Details - #${selectedClaim ? selectedClaim.id : ''}`}</div>
+        <div className="fnol-profile">
+          <div className="fnol-profile-icon" />
+          <div className="fnol-profile-name">Joan profile</div>
+        </div>
+      </header>
+      <main className="fnol-main white-bg">
+        <div className="fnol-tabs">
             {tabs.map(tab => (
               <div
                 key={tab}

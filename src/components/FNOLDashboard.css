@@ -112,7 +112,7 @@
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(24,58,90,0.08);
-  padding: 32px 24px;
+  padding: 0 24px;
 }
 .fnol-tabs {
   display: flex;
@@ -170,12 +170,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  background-color: #20406a;
+  padding: 0 24px 0 0;
+  min-height: 64px;
+  border-radius: 0;
 }
 .fnol-header .fnol-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #009688;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
 }
 .fnol-header .fnol-profile {
   display: flex;
@@ -183,12 +187,12 @@
   gap: 12px;
 }
 .fnol-header .fnol-profile-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #e0e0e0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
 }
 .fnol-header .fnol-profile-name {
-  font-weight: 600;
-  color: #183a5a;
+    font-weight: 600;
+    color: #fff;
 }
