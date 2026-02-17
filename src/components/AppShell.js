@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './AppShell.css';
 
 const RECENT_CLAIMS_LIMIT = 10;
 
 export default function AppShell({ children, pageTitle, recentClaims = [], selectedClaim, onSelectClaim, onGoToClaims, onSignOut }) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const recent = recentClaims.slice(0, RECENT_CLAIMS_LIMIT);
+
 
   return (
     <div className="app-shell">
@@ -53,58 +55,25 @@ export default function AppShell({ children, pageTitle, recentClaims = [], selec
           </div>
         </div>
       </header>
-
-      <aside className={`app-shell-sidebar${sidebarCollapsed ? ' collapsed' : ''}`} aria-label="Navigation">
+      <nav className="app-shell-tabs-bar" aria-label="Main tabs">
         <button
-          className="app-shell-sidebar-toggle"
-          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          onClick={() => setSidebarCollapsed((v) => !v)}
+          className={`app-shell-tab${location.pathname === '/' || location.pathname === '/dashboard' ? ' app-shell-tab-active' : ''}`}
+          onClick={() => navigate('/dashboard')}
+          aria-current={location.pathname === '/' || location.pathname === '/dashboard' ? 'page' : undefined}
+          type="button"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect y="4" width="24" height="2.5" rx="1.25" fill="#111" />
-            <rect y="10.75" width="24" height="2.5" rx="1.25" fill="#111" />
-            <rect y="17.5" width="24" height="2.5" rx="1.25" fill="#111" />
-          </svg>
+          Dashboard
         </button>
-        {!sidebarCollapsed && (
-          <nav className="app-shell-nav">
-          <button
-            type="button"
-            className="app-shell-nav-item app-shell-nav-item--active"
-            onClick={onGoToClaims}
-            aria-current={!selectedClaim ? 'page' : undefined}
-          >
-            Claims
-          </button>
-        </nav>
-        )}
-        {!sidebarCollapsed && recent.length > 0 && (
-          <div className="app-shell-recent">
-            <h2 className="app-shell-recent-title">Recent</h2>
-            <ul className="app-shell-recent-list" role="list">
-              {recent.map((claim) => (
-                <li key={claim.id}>
-                  <button
-                    type="button"
-                    className={`app-shell-recent-item ${selectedClaim?.id === claim.id ? 'app-shell-recent-item--active' : ''}`}
-                    onClick={() => onSelectClaim?.(claim)}
-                  >
-                    <span className="app-shell-recent-id">#{claim.id}</span>
-                    <span className="app-shell-recent-subject" title={claim.email_subject}>
-                      {claim.email_subject || 'No subject'}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </aside>
-
+        <button
+          className={`app-shell-tab${location.pathname === '/claims' ? ' app-shell-tab-active' : ''}`}
+          onClick={() => navigate('/claims')}
+          aria-current={location.pathname === '/claims' ? 'page' : undefined}
+          type="button"
+        >
+          Recent Claims
+        </button>
+      </nav>
       <main className="app-shell-main" role="main">
-        {pageTitle && (
-          <h1 className="app-shell-page-title">{pageTitle}</h1>
-        )}
         {children}
       </main>
     </div>

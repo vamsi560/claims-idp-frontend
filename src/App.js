@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
-import MainLayout from './components/MainLayout';
+import AppShell from './components/AppShell';
 import DashboardPage from './components/DashboardPage';
 import RecentClaims from './components/RecentClaims';
 import ClaimDetails from './components/ClaimDetails';
@@ -93,7 +93,7 @@ function AppContent() {
       <Route path="/" element={<Login onLogin={handleLogin} />} />
       <Route path="/dashboard" element={
         loggedIn ? (
-          <MainLayout activePage="dashboard" onNavigate={setActivePage}>
+          <AppShell pageTitle="Dashboard" recentClaims={recentClaimsForSidebar}>
             {loading ? <ClaimsTableSkeleton /> : error ? (
               <div className="app-error-state" role="alert">
                 <p className="app-error-message">{error}</p>
@@ -102,12 +102,12 @@ function AppContent() {
             ) : (
               <DashboardPage claims={allClaims} />
             )}
-          </MainLayout>
+          </AppShell>
         ) : <Navigate to="/" />
       } />
       <Route path="/claims" element={
         loggedIn ? (
-          <MainLayout activePage="claims" onNavigate={setActivePage}>
+          <AppShell pageTitle="Recent Claims" recentClaims={recentClaimsForSidebar}>
             {loading ? <ClaimsTableSkeleton /> : error ? (
               <div className="app-error-state" role="alert">
                 <p className="app-error-message">{error}</p>
@@ -123,7 +123,7 @@ function AppContent() {
                 onView={(claim) => navigate(`/claims/${claim.id}`)}
               />
             )}
-          </MainLayout>
+          </AppShell>
         ) : <Navigate to="/" />
       } />
       <Route path="/claims/:id" element={<ClaimDetailsRoute allClaims={allClaims} recentClaims={recentClaimsForSidebar} loggedIn={loggedIn} onSignOut={handleLogout} />} />
@@ -142,13 +142,13 @@ function ClaimDetailsRoute({ allClaims, recentClaims, loggedIn, onSignOut }) {
   if (!claim) return <Navigate to="/" />;
 
   return (
-    <MainLayout activePage="claims" onNavigate={(page) => navigate(page === 'dashboard' ? '/dashboard' : '/claims')}>
+    <AppShell pageTitle={`Claim #${claim.id}`} recentClaims={recentClaims}>
       <ClaimDetails
         claim={claim}
-        onBack={() => navigate('/home')}
+        onBack={() => navigate('/claims')}
         onEdit={() => navigate(`/claims/${claim.id}/edit`)}
       />
-    </MainLayout>
+    </AppShell>
   );
 }
 
@@ -162,13 +162,13 @@ function ClaimEditRoute({ allClaims, recentClaims, loggedIn, onSignOut }) {
   if (!claim) return <Navigate to="/" />;
 
   return (
-    <MainLayout activePage="claims" onNavigate={(page) => navigate(page === 'dashboard' ? '/dashboard' : '/claims')}>
+    <AppShell pageTitle={`Edit Claim #${claim.id}`} recentClaims={recentClaims}>
       <FNOLEdit
         workItem={claim}
         onBack={() => navigate(`/claims/${claim.id}`)}
         onSaveSuccess={() => navigate(`/claims/${claim.id}`)}
       />
-    </MainLayout>
+    </AppShell>
   );
 }
 

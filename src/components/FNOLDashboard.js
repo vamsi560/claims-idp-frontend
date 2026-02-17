@@ -1,45 +1,14 @@
 
+
 import React, { useState, useEffect } from 'react';
-import { fetchClaimsSummary, fetchClaimsTrend } from '../api';
-import {
-  Bar,
-  Pie,
-  Line
-} from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-} from 'chart.js';
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, PointElement, LineElement, Tooltip, Legend);
+import { Pie, Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, ArcElement, PointElement, LineElement, Tooltip, Legend } from 'chart.js';
+ChartJS.register(CategoryScale, LinearScale, ArcElement, PointElement, LineElement, Tooltip, Legend);
 import './FNOLDashboard.css';
 
-const tabs = ['Analytics', 'Summary', 'Email Source', 'Extracted Data', 'Attachments'];
+import { fetchClaimsSummary, fetchClaimsTrend } from '../api';
 
-function renderExtractedFields(fields) {
-  if (!fields || typeof fields !== 'object') return <div>No extracted fields.</div>;
-  return (
-    <div className="fnol-details-grid">
-      {Object.entries(fields).map(([key, value]) => (
-        <React.Fragment key={key}>
-          <label>{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</label>
-          <input value={typeof value === 'object' ? JSON.stringify(value) : value ?? ''} readOnly />
-        </React.Fragment>
-      ))}
-    </div>
-  );
-}
-
-export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) {
-  const [activeTab, setActiveTab] = useState('Analytics');
-  // Safe default for onSelectClaim
-  const handleSelectClaim = onSelectClaim && typeof onSelectClaim === 'function' ? onSelectClaim : () => {};
+export default function FNOLDashboard() {
   const [summary, setSummary] = useState(null);
   const [trend, setTrend] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,143 +29,156 @@ export default function FNOLDashboard({ claims, selectedClaim, onSelectClaim }) 
       }
       setLoading(false);
     }
-    if (activeTab === 'Analytics') loadAnalytics();
-  }, [activeTab]);
+    loadAnalytics();
+  }, []);
 
   // Prepare chart data
   const statusLabels = summary ? Object.keys(summary.claims_by_status || {}) : [];
   const statusCounts = summary ? Object.values(summary.claims_by_status || {}) : [];
-  const typeLabels = summary ? Object.keys(summary.claims_by_type || {}) : [];
-  const typeCounts = summary ? Object.values(summary.claims_by_type || {}) : [];
-  const trendLabels = trend.map(t => t.date);
+  // statusColors: [pending, complete, ...] - pending: light orange, complete: green
+  const statusColors = ['#ffb300', '#43a047', '#4caf50', '#e53935'];
+  const statusPercentages = summary && summary.claims_by_status ? Object.values(summary.claims_by_status).map(
+    (count, i, arr) => arr.reduce((a, b) => a + b, 0) ? Math.round((count / arr.reduce((a, b) => a + b, 0)) * 100) : 0
+  ) : [];
+  const trendLabels = trend.map((t, i) => `Day ${i + 1}`);
   const trendCounts = trend.map(t => t.count);
 
   return (
-    <div className="fnol-dashboard white-bg">
-      <header className="fnol-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <img src="/images/ValueMomentum_logo.png" alt="ValueMomentum Logo" style={{ width: 100, height: 40, marginLeft: '10px' }} />
-          <span style={{ fontWeight: 700, fontSize: 24, color: '#222' }}>Claims Workbench</span>
-        </div>
-        <div className="fnol-title teal-text">{activeTab === 'Analytics' ? 'Claims Analytics' : `Claim Details - #${selectedClaim ? selectedClaim.id : ''}`}</div>
-        <div className="fnol-profile">
-          <div className="fnol-profile-icon" />
-          <div className="fnol-profile-name">Joan profile</div>
-        </div>
-      </header>
-      <main className="fnol-main white-bg">
-        <div className="fnol-tabs">
-            {tabs.map(tab => (
-              <div
-                key={tab}
-                className={`fnol-tab${activeTab === tab ? ' active' : ''}`}
-                onClick={() => setActiveTab(tab)}
-                style={{ color: activeTab === tab ? '#009688' : '#183a5a', borderBottom: activeTab === tab ? '2px solid #009688' : '2px solid transparent' }}
-              >{tab}</div>
-            ))}
-          </div>
-        {activeTab === 'Analytics' && (
-          <div style={{ margin: '24px 0' }}>
-            {loading ? <div>Loading analytics...</div> : summary && (
-              <>
-                <div style={{ display: 'flex', gap: '32px', marginBottom: 32 }}>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 18 }}>Claims by Status</div>
-                    <Pie
-                      data={{
-                        labels: statusLabels,
-                        datasets: [{
-                          data: statusCounts,
-                          backgroundColor: ['#009688', '#4dd0e1', '#80cbc4', '#e0e0e0', '#b2dfdb', '#26a69a'],
-                        }]
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 18 }}>Claims by Type</div>
-                    <Bar
-                      data={{
-                        labels: typeLabels,
-                        datasets: [{
-                          label: 'Count',
-                          data: typeCounts,
-                          backgroundColor: '#009688',
-                        }]
-                      }}
-                      options={{
-                        plugins: { legend: { display: false } },
-                        scales: { x: { ticks: { color: '#009688' } }, y: { beginAtZero: true } }
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 18 }}>Avg. Processing Time</div>
-                    <div style={{ fontSize: 32, color: '#009688', fontWeight: 700 }}>
-                      {Math.round((summary.average_processing_time_seconds || 0) / 3600 * 10) / 10} hrs
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 8 }}>Claims Trend (Last 30 Days)</div>
-                  <Line
-                    data={{
-                      labels: trendLabels,
-                      datasets: [{
-                        label: 'Claims',
-                        data: trendCounts,
-                        borderColor: '#009688',
-                        backgroundColor: 'rgba(0,150,136,0.15)',
-                        tension: 0.3
-                      }]
-                    }}
-                    options={{
-                      plugins: { legend: { display: false } },
-                      scales: { x: { ticks: { color: '#009688' } }, y: { beginAtZero: true } }
-                    }}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        )}
-        {activeTab === 'Extracted Data' && selectedClaim && (
-          <>
-            {renderExtractedFields(selectedClaim.extracted_fields)}
-            <div style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
-              <button className="fnol-view-email-btn teal-btn">Save</button>
-              <button className="fnol-view-email-btn teal-btn">Submit</button>
+    <div className="dashboard-root">
+      {/* Main dashboard content only, header/nav/titles removed as requested */}
+      <main className="dashboard-main">
+        {/* Top summary cards */}
+        <div className="dashboard-cards-row">
+          <div className="dashboard-card">
+            <div className="dashboard-card-icon">
+              {/* Document Icon for Total Claims */}
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="3" width="14" height="18" rx="2" fill="#20406a" />
+                <rect x="7" y="7" width="10" height="2" rx="1" fill="#fff" />
+                <rect x="7" y="11" width="10" height="2" rx="1" fill="#fff" />
+                <rect x="7" y="15" width="6" height="2" rx="1" fill="#fff" />
+              </svg>
             </div>
-          </>
-        )}
-        {activeTab === 'Summary' && selectedClaim && (
-          <div style={{ marginBottom: '24px' }}>
-            <strong>Summary:</strong> {selectedClaim.extracted_fields?.summary || '—'}
+            <div>
+              <div className="dashboard-card-label">Total Claims</div>
+              <div className="dashboard-card-value">{
+                summary && summary.claims_by_status
+                  ? Object.values(summary.claims_by_status).reduce((a, b) => Number(a) + Number(b), 0)
+                  : '--'
+              }</div>
+            </div>
           </div>
-        )}
-        {activeTab === 'Email Source' && selectedClaim && (
-          <div style={{ marginBottom: '24px' }}>
-            <strong>Email Subject:</strong> {selectedClaim.email_subject}<br />
-            <strong>Email Body:</strong>
-            <pre>{selectedClaim.email_body}</pre>
+          {/* Removed New Claims card */}
+          <div className="dashboard-card">
+            <div className="dashboard-card-icon">
+              {/* Pending/Clock Icon for In Progress (light orange) */}
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="#ffb300" />
+                <path d="M12 7v5l3 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="dashboard-card-label">In Progress</div>
+              <div className="dashboard-card-value">{
+                summary && summary.claims_by_status && typeof summary.claims_by_status.pending !== 'undefined'
+                  ? Number(summary.claims_by_status.pending)
+                  : '--'
+              }</div>
+            </div>
           </div>
-        )}
-        {activeTab === 'Attachments' && selectedClaim && (
-          <div style={{ marginBottom: '24px' }}>
-            <strong>Attachments:</strong>
-            {Array.isArray(selectedClaim.attachments) && selectedClaim.attachments.length ? (
-              <ul>
-                {selectedClaim.attachments.map(att => (
-                  typeof att === 'object' && att.id && att.filename && att.blob_url ? (
-                    <li key={att.id}>
-                      <a href={att.blob_url} target="_blank" rel="noopener noreferrer">{att.filename}</a> ({att.doc_type})
-                    </li>
-                  ) : null
-                ))}
-              </ul>
-            ) : '—'}
+          <div className="dashboard-card">
+            <div className="dashboard-card-icon">
+              {/* Completed Icon (green) */}
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="#43a047" />
+                <path d="M7 13l3 3 7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="dashboard-card-label">Completed</div>
+              <div className="dashboard-card-value">{
+                summary && summary.claims_by_status && typeof summary.claims_by_status.complete !== 'undefined'
+                  ? Number(summary.claims_by_status.complete)
+                  : '--'
+              }</div>
+            </div>
           </div>
-        )}
-        {/* No View Original Email button, replaced by Save/Submit */}
+        </div>
+        {/* Charts row */}
+        <div className="dashboard-charts-row">
+          <div className="dashboard-card chart-card">
+            <div className="dashboard-card-label">Claims by Status</div>
+            <Pie
+              data={{
+                labels: statusLabels,
+                datasets: [{
+                  data: statusCounts,
+                  backgroundColor: statusColors,
+                }]
+              }}
+              options={{
+                plugins: {
+                  legend: {
+                    position: 'right',
+                    labels: {
+                      color: '#20406a',
+                      font: { size: 14 }
+                    }
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        const percent = statusPercentages[context.dataIndex] || 0;
+                        return `${label} (${percent}%)`;
+                      }
+                    }
+                  }
+                },
+                cutout: '70%',
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+              height={220}
+            />
+          </div>
+          <div className="dashboard-card chart-card">
+            <div className="dashboard-card-label">Claims Trend (Last 30 Days)</div>
+            <Line
+              data={{
+                labels: trendLabels,
+                datasets: [{
+                  label: 'Claims',
+                  data: trendCounts,
+                  borderColor: '#20406a',
+                  backgroundColor: 'rgba(32,64,106,0.08)',
+                  tension: 0.3,
+                  fill: true,
+                  pointRadius: 0
+                }]
+              }}
+              options={{
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: {
+                    ticks: { color: '#20406a', font: { size: 12 } },
+                    grid: { display: false }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    ticks: { color: '#20406a', font: { size: 12 } },
+                    grid: { color: '#e0e0e0' }
+                  }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+              height={220}
+            />
+          </div>
+        </div>
+        {/* Recent Activity removed */}
       </main>
     </div>
   );
