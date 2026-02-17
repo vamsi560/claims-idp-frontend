@@ -45,6 +45,7 @@ export default function AppShell({ children, pageTitle, recentClaims = [], selec
                     onClick={() => {
                       setUserMenuOpen(false);
                       onSignOut?.();
+                      navigate('/');
                     }}
                   >
                     Sign out
