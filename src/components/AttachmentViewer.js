@@ -25,9 +25,20 @@ function AttachmentViewer({ attachments }) {
         <ul style={{ paddingLeft: 0, listStyle: 'none' }}>
           {uniqueAttachments.map((att, idx) =>
             typeof att === 'object' && att.id && att.filename && att.blob_url ? (
-              <li key={att.id} style={{ marginBottom: 8 }}>
+              <li key={att.id} style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <a href={att.blob_url} target="_blank" rel="noopener noreferrer">{att.filename}</a>
-                {att.doc_type ? ` (${att.doc_type})` : ''}
+                {att.doc_type && (
+                  <span style={{
+                    display: 'inline-block',
+                    background: '#e0e0e0',
+                    color: '#20406a',
+                    borderRadius: '12px',
+                    padding: '2px 10px',
+                    fontSize: '0.85em',
+                    fontWeight: 500,
+                    marginLeft: 4
+                  }}>{att.doc_type}</span>
+                )}
               </li>
             ) : (
               <li key={idx}>{JSON.stringify(att)}</li>

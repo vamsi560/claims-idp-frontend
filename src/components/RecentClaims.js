@@ -3,6 +3,10 @@ import EmptyClaimsState from './EmptyClaimsState';
 import './RecentClaims.css';
 
 export default function RecentClaims({ claims, onView, sortBy, setSortBy, filter, setFilter }) {
+  // Debug: Log claims data to the console whenever it changes
+  React.useEffect(() => {
+    console.log('Claims data for table:', claims);
+  }, [claims]);
   const isEmpty = claims.length === 0;
   const isFilteredEmpty = filter.trim() !== '';
 
@@ -55,6 +59,7 @@ export default function RecentClaims({ claims, onView, sortBy, setSortBy, filter
                   <th scope="col">Claim ID</th>
                   <th scope="col">Subject</th>
                   <th scope="col">Date Received</th>
+                  <th scope="col">Tag</th>
                   <th scope="col">Status</th>
                   <th scope="col">Action</th>
                 </tr>
@@ -65,6 +70,7 @@ export default function RecentClaims({ claims, onView, sortBy, setSortBy, filter
                     <td>#{claim.id}</td>
                     <td>{claim.email_subject}</td>
                     <td>{claim.created_at ? claim.created_at.split('T')[0] : '—'}</td>
+                    <td>{claim.tag ? claim.tag : <span style={{color:'#aaa'}}>—</span>}</td>
                     <td>
                       <span className={`status-badge status-${(claim.status || 'new').toLowerCase().replace(/\s+/g, '')}`}>
                         {claim.status || 'New'}
