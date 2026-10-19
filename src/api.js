@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://claims-idp-backend-bbe0f4hkckhdcubv.centralus-01.azurewebsites.net";
+const API_BASE = "https://claims-idp-byhphxaphvexd4ak.eastus-01.azurewebsites.net";
 
 export async function fetchClaimsSummary() {
   const res = await axios.get(`${API_BASE}/analytics/claims-summary`);
