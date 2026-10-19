@@ -61,6 +61,7 @@ export default function RecentClaims({ claims, onView, sortBy, setSortBy, filter
                   <th scope="col">Date Received</th>
                   <th scope="col">Tag</th>
                   <th scope="col">Status</th>
+                  <th scope="col">TPA Partner</th>
                   <th scope="col">Action</th>
                 </tr>
               </thead>
@@ -75,6 +76,20 @@ export default function RecentClaims({ claims, onView, sortBy, setSortBy, filter
                       <span className={`status-badge status-${(claim.status || 'new').toLowerCase().replace(/\s+/g, '')}`}>
                         {claim.status || 'New'}
                       </span>
+                    </td>
+                    <td>
+                      {claim.tpa_reference_id ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--cw-text)' }}>
+                            {claim.tpa_provider?.code || claim.tpa_reference_id.split('-')[0]}
+                          </span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--cw-text-muted)', fontFamily: 'monospace' }}>
+                            {claim.tpa_status || 'Assigned'}
+                          </span>
+                        </div>
+                      ) : (
+                        <span style={{ color: '#aaa', fontSize: '0.85rem' }}>Unassigned</span>
+                      )}
                     </td>
                     <td>
                       <button
@@ -100,13 +115,21 @@ export default function RecentClaims({ claims, onView, sortBy, setSortBy, filter
               >
                 <div className="claim-card-header">
                   <span className="claim-card-id">#{claim.id}</span>
-                  <span className={`status-badge status-${(claim.status || 'new').toLowerCase().replace(/\s+/g, '')}`}>
-                    {claim.status || 'New'}
-                  </span>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {claim.tpa_status && (
+                      <span className="status-badge" style={{ background: '#2563eb' }}>
+                        TPA: {claim.tpa_status}
+                      </span>
+                    )}
+                    <span className={`status-badge status-${(claim.status || 'new').toLowerCase().replace(/\s+/g, '')}`}>
+                      {claim.status || 'New'}
+                    </span>
+                  </div>
                 </div>
                 <h2 className="claim-card-subject">{claim.email_subject}</h2>
                 <p className="claim-card-date">
                   {claim.created_at ? claim.created_at.split('T')[0] : '—'}
+                  {claim.tpa_reference_id && ` • TPA: ${claim.tpa_reference_id}`}
                 </p>
                 <button
                   type="button"

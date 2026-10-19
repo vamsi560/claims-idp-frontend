@@ -1,6 +1,5 @@
-
-import React, { useState } from 'react';
-import { updateFNOL } from '../api';
+import React, { useState, useEffect } from 'react';
+import { updateFNOL, fetchTPAProviders, assignTPAToClaim, retryTPAPush, simulateTPAUpdate, fetchTPAStatus } from '../api';
 import './ClaimDetails.css';
 import AttachmentViewer from './AttachmentViewer';
 
@@ -109,23 +108,110 @@ function SectionBlock({ title, entries }) {
   );
 }
 
-export default function ClaimDetails({ claim, onBack, onEdit }) {
+export default function ClaimDetails({ claim: initialClaim, onBack, onEdit }) {
+  const [claim, setClaim] = useState(initialClaim);
   const [showOriginalEmail, setShowOriginalEmail] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  // TPA State
+  const [providers, setProviders] = useState([]);
+  const [selectedProviderId, setSelectedProviderId] = useState('');
+  const [tpaActionLoading, setTpaActionLoading] = useState(false);
+  const [tpaMessage, setTpaMessage] = useState(null);
+  const [tpaError, setTpaError] = useState(null);
+
+  useEffect(() => {
+    setClaim(initialClaim);
+  }, [initialClaim]);
+
+  // Load available TPA providers
+  useEffect(() => {
+    async function loadProviders() {
+      try {
+        const data = await fetchTPAProviders();
+        setProviders(data);
+        if (data.length > 0 && !selectedProviderId) {
+          setSelectedProviderId(data[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to load TPA providers:', err);
+      }
+    }
+    loadProviders();
+  }, []);
+
+  // Refresh TPA status for this claim
+  const refreshTPAStatus = async () => {
+    try {
+      const statusData = await fetchTPAStatus(claim.id);
+      setClaim(prev => ({
+        ...prev,
+        status: statusData.internal_status,
+        tpa_reference_id: statusData.tpa_reference_id,
+        tpa_status: statusData.tpa_status,
+        tpa_pushed_at: statusData.tpa_pushed_at,
+        tpa_last_updated: statusData.tpa_last_updated,
+        tpa_provider: statusData.tpa_provider,
+      }));
+    } catch (err) {
+      console.error('Failed to refresh TPA status:', err);
+    }
+  };
+
+  const handleAssignTPA = async () => {
+    if (!selectedProviderId) return;
+    setTpaActionLoading(true);
+    setTpaError(null);
+    setTpaMessage(null);
+    try {
+      const res = await assignTPAToClaim(claim.id, selectedProviderId);
+      setTpaMessage(`Assigned to ${res.provider}! Ref: ${res.tpa_reference_id}`);
+      await refreshTPAStatus();
+    } catch (err) {
+      setTpaError(err.response?.data?.detail || 'Failed to assign claim to TPA.');
+    } finally {
+      setTpaActionLoading(false);
+    }
+  };
+
+  const handleRetryPush = async () => {
+    setTpaActionLoading(true);
+    setTpaError(null);
+    setTpaMessage(null);
+    try {
+      const res = await retryTPAPush(claim.id);
+      setTpaMessage(`Claim pushed successfully! Ref: ${res.tpa_reference_id}`);
+      await refreshTPAStatus();
+    } catch (err) {
+      setTpaError(err.response?.data?.detail || 'Failed to push claim to TPA.');
+    } finally {
+      setTpaActionLoading(false);
+    }
+  };
+
+  const handleSimulateUpdate = async () => {
+    setTpaActionLoading(true);
+    setTpaError(null);
+    setTpaMessage(null);
+    try {
+      const res = await simulateTPAUpdate(claim.id);
+      setTpaMessage(`Simulated update received: status is now "${res.new_status}"`);
+      await refreshTPAStatus();
+    } catch (err) {
+      setTpaError(err.response?.data?.detail || 'Failed to simulate status update.');
+    } finally {
+      setTpaActionLoading(false);
+    }
+  };
+
   const handleSave = async () => {
-    console.log('=== SAVE BUTTON CLICKED ===');
-    console.log('Claim ID:', claim.id);
-    console.log('API Call: PUT /fnol/' + claim.id + '/');
-    console.log('Payload:', { extracted_fields: claim.extracted_fields });
     setSaving(true);
     setError(null);
     setSuccess(null);
     try {
       await updateFNOL(claim.id, { extracted_fields: claim.extracted_fields });
-      console.log('Save successful');
       setSuccess('Changes saved.');
     } catch (err) {
       console.error('Save failed:', err);
@@ -178,6 +264,112 @@ export default function ClaimDetails({ claim, onBack, onEdit }) {
           )}
         </div>
       </header>
+
+      {/* ─────────────────────────────────────────────
+          TPA Management Card
+      ───────────────────────────────────────────── */}
+      <div className="claim-details-card tpa-management-card">
+        <div className="tpa-card-header">
+          <div>
+            <h2 className="claim-details-card-heading" style={{ margin: 0 }}>Third Party Administrator (TPA)</h2>
+            <p className="tpa-card-subheading">
+              Manage external claim handoff, dispatch status, and synchronization.
+            </p>
+          </div>
+          {claim.tpa_status && (
+            <span className={`status-badge status-${claim.tpa_status.toLowerCase().replace(/\s+/g, '')}`}>
+              TPA: {claim.tpa_status}
+            </span>
+          )}
+        </div>
+
+        <div className="tpa-info-grid">
+          <div className="claim-details-field">
+            <span className="claim-info-label">Assigned Provider</span>
+            <span className="claim-info-value">
+              {claim.tpa_provider?.name || (claim.tpa_reference_id ? 'Assigned' : 'Not assigned yet')}
+              {claim.tpa_provider?.is_mock && <span className="tpa-mock-tag">Mock Mode</span>}
+            </span>
+          </div>
+
+          <div className="claim-details-field">
+            <span className="claim-info-label">TPA Reference ID</span>
+            <span className="claim-info-value" style={{ fontFamily: 'monospace', fontWeight: 600 }}>
+              {claim.tpa_reference_id || '—'}
+            </span>
+          </div>
+
+          <div className="claim-details-field">
+            <span className="claim-info-label">Last Pushed</span>
+            <span className="claim-info-value">
+              {claim.tpa_pushed_at ? new Date(claim.tpa_pushed_at).toLocaleString() : '—'}
+            </span>
+          </div>
+
+          <div className="claim-details-field">
+            <span className="claim-info-label">TPA Last Updated</span>
+            <span className="claim-info-value">
+              {claim.tpa_last_updated ? new Date(claim.tpa_last_updated).toLocaleString() : '—'}
+            </span>
+          </div>
+        </div>
+
+        <div className="tpa-actions-bar">
+          <div className="tpa-assign-group">
+            <label htmlFor="tpa-select" className="tpa-assign-label">Assign TPA Partner:</label>
+            <select
+              id="tpa-select"
+              className="tpa-select"
+              value={selectedProviderId}
+              onChange={(e) => setSelectedProviderId(e.target.value)}
+              disabled={tpaActionLoading || providers.length === 0}
+            >
+              {providers.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} ({p.code}) {p.is_mock ? '• Mock' : ''}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleAssignTPA}
+              disabled={tpaActionLoading || !selectedProviderId}
+            >
+              {tpaActionLoading ? 'Assigning...' : (claim.tpa_reference_id ? 'Reassign & Push' : 'Assign & Push')}
+            </button>
+          </div>
+
+          <div className="tpa-quick-buttons">
+            {claim.tpa_reference_id && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleRetryPush}
+                disabled={tpaActionLoading}
+                title="Resend claim payload to TPA"
+              >
+                Re-Push Claim
+              </button>
+            )}
+
+            {claim.tpa_reference_id && (
+              <button
+                type="button"
+                className="btn btn-secondary tpa-simulate-btn"
+                onClick={handleSimulateUpdate}
+                disabled={tpaActionLoading}
+                title="Simulate status advancement from TPA in mock mode"
+              >
+                Simulate Status Update
+              </button>
+            )}
+          </div>
+        </div>
+
+        {tpaMessage && <p className="tpa-feedback-success" role="status">{tpaMessage}</p>}
+        {tpaError && <p className="tpa-feedback-error" role="alert">{tpaError}</p>}
+      </div>
 
       <div className="claim-details-card claim-details-extracted">
         <h2 className="claim-details-card-heading">Extracted Details</h2>

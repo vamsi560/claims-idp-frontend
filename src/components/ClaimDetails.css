@@ -233,3 +233,124 @@
     align-items: flex-start;
   }
 }
+
+/* ─────────────────────────────────────────────
+   TPA Management Card Styles
+───────────────────────────────────────────── */
+.tpa-management-card {
+  border-left: 5px solid #2563eb;
+  background: linear-gradient(to right, #f8fafc, #ffffff);
+}
+
+.tpa-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tpa-card-subheading {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--cw-text-muted);
+}
+
+.tpa-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  background: #ffffff;
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--cw-border);
+  margin-bottom: 20px;
+}
+
+.tpa-mock-tag {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 2px 7px;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
+.tpa-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.tpa-assign-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tpa-assign-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--cw-text);
+}
+
+.tpa-select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--cw-border);
+  background: #ffffff;
+  font-size: 0.9rem;
+  color: var(--cw-text);
+  min-width: 220px;
+}
+
+.tpa-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.tpa-quick-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tpa-simulate-btn {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+.tpa-simulate-btn:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.tpa-feedback-success {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tpa-feedback-error {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+

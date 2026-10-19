@@ -7,6 +7,7 @@ import ClaimDetails from './components/ClaimDetails';
 import FNOLEdit from './components/FNOLEdit';
 import Login from './components/Login';
 import ClaimsTableSkeleton from './components/ClaimsTableSkeleton';
+import TPAPartners from './components/TPAPartners';
 import { fetchFNOLs } from './api';
 import './App.css';
 
@@ -123,6 +124,13 @@ function AppContent() {
                 onView={(claim) => navigate(`/claims/${claim.id}`)}
               />
             )}
+          </AppShell>
+        ) : <Navigate to="/" />
+      } />
+      <Route path="/tpa-partners" element={
+        loggedIn ? (
+          <AppShell pageTitle="TPA Partners" recentClaims={recentClaimsForSidebar}>
+            <TPAPartners />
           </AppShell>
         ) : <Navigate to="/" />
       } />

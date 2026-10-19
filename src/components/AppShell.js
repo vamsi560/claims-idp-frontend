@@ -73,6 +73,14 @@ export default function AppShell({ children, pageTitle, recentClaims = [], selec
         >
           Recent Claims
         </button>
+        <button
+          className={`app-shell-tab${location.pathname === '/tpa-partners' ? ' app-shell-tab-active' : ''}`}
+          onClick={() => navigate('/tpa-partners')}
+          aria-current={location.pathname === '/tpa-partners' ? 'page' : undefined}
+          type="button"
+        >
+          TPA Partners
+        </button>
       </nav>
       <main className="app-shell-main" role="main">
         {children}
