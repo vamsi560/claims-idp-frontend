@@ -354,3 +354,112 @@
   font-weight: 600;
 }
 
+/* ─────────────────────────────────────────────
+    Confidence Badge & Provenance Tooltip
+───────────────────────────────────────────── */
+.confidence-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  position: relative;
+  cursor: help;
+  vertical-align: middle;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.confidence-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+.confidence-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Color tiers */
+.confidence-high {
+  background: #e6f4ea;
+  color: #137333;
+  border: 1px solid #ceead6;
+}
+
+.confidence-med {
+  background: #fef7e0;
+  color: #b06000;
+  border: 1px solid #feefc3;
+}
+
+.confidence-low {
+  background: #fce8e6;
+  color: #c5221f;
+  border: 1px solid #fad2cf;
+}
+
+/* Interactive Floating Tooltip */
+.confidence-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  max-width: 280px;
+  background-color: #1e293b;
+  color: #f8fafc;
+  text-align: left;
+  border-radius: 8px;
+  padding: 8px 12px;
+  position: absolute;
+  z-index: 1000;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.confidence-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #1e293b transparent transparent transparent;
+}
+
+.confidence-tag:hover .confidence-tooltip,
+.confidence-tag:focus .confidence-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.tooltip-line {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.tooltip-line:last-child {
+  margin-bottom: 0;
+}
+
+.tooltip-line strong {
+  color: #94a3b8;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+

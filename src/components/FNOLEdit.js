@@ -267,7 +267,7 @@ function FNOLEdit({ workItem, onBack, onSaveSuccess }) {
     sectioned[sectionName] = keys.filter((k) => fields.hasOwnProperty(k));
     sectioned[sectionName].forEach((k) => allKeys.delete(k));
   });
-  const otherKeys = Array.from(allKeys);
+  const otherKeys = Array.from(allKeys).filter((k) => k !== '_field_metadata');
 
   return (
     <div className="fnol-edit">

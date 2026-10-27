@@ -24,22 +24,72 @@ function formatPrimitive(value) {
   return String(value);
 }
 
-function FieldRow({ label, value }) {
+function ConfidenceBadge({ meta }) {
+  if (!meta) return null;
+  const rawConf = meta.confidence;
+  let pct = null;
+  if (typeof rawConf === 'number') {
+    pct = rawConf <= 1 ? Math.round(rawConf * 100) : Math.round(rawConf);
+  } else if (typeof rawConf === 'string' && rawConf.includes('%')) {
+    pct = parseInt(rawConf, 10);
+  } else if (!isNaN(Number(rawConf))) {
+    pct = Math.round(Number(rawConf) <= 1 ? Number(rawConf) * 100 : Number(rawConf));
+  }
+
+  const levelClass = pct == null ? 'confidence-med' : pct >= 90 ? 'confidence-high' : pct >= 70 ? 'confidence-med' : 'confidence-low';
+  const sourceText = meta.source || 'Model Inferred';
+
+  return (
+    <span
+      className={`confidence-tag ${levelClass}`}
+      tabIndex={0}
+      aria-label={`Confidence: ${pct != null ? pct + '%' : 'N/A'}, Source: ${sourceText}`}
+    >
+      <span className="confidence-dot" aria-hidden="true" />
+      <span className="confidence-text">{pct != null ? `${pct}%` : 'Extracted'}</span>
+      <span className="confidence-tooltip" role="tooltip">
+        <span className="tooltip-line">
+          <strong>Confidence:</strong> {pct != null ? `${pct}%` : 'N/A'}
+        </span>
+        <span className="tooltip-line">
+          <strong>Extracted from:</strong> {sourceText}
+        </span>
+        {meta.page && (
+          <span className="tooltip-line">
+            <strong>Page:</strong> {meta.page}
+          </span>
+        )}
+      </span>
+    </span>
+  );
+}
+
+function FieldRow({ label, value, metadata, parentPath = '' }) {
   const isObject = typeof value === 'object' && value !== null && !Array.isArray(value);
   const isArrayOfObjects = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object';
+  const fieldPath = parentPath ? `${parentPath}.${label}` : label;
+  const meta = metadata ? (metadata[fieldPath] || metadata[label]) : null;
 
   if (isArrayOfObjects) {
     return (
       <div className="claim-details-field claim-details-field--nested-group">
-        <span className="claim-info-label">{formatLabel(label)}</span>
+        <span className="claim-info-label">
+          {formatLabel(label)}
+          {meta && <ConfidenceBadge meta={meta} />}
+        </span>
         <div className="claim-details-nested-list">
           {value.map((item, idx) => (
             <div key={idx} className="claim-details-nested-block">
               {Object.entries(item).map(([k, v]) => {
                 const isNestedObj = typeof v === 'object' && v !== null && !Array.isArray(v);
+                const subPath = `${fieldPath}[${idx}].${k}`;
+                const subMeta = metadata ? (metadata[subPath] || metadata[`${label}.${k}`] || metadata[k]) : null;
                 return (
                   <div key={k} className="claim-details-field">
-                    <span className="claim-info-label">{formatLabel(k)}</span>
+                    <span className="claim-info-label">
+                      {formatLabel(k)}
+                      {subMeta && <ConfidenceBadge meta={subMeta} />}
+                    </span>
                     <span className="claim-info-value">
                       {isNestedObj
                         ? (
@@ -66,14 +116,24 @@ function FieldRow({ label, value }) {
   if (isObject) {
     return (
       <div className="claim-details-field claim-details-field--nested-group">
-        <span className="claim-info-label">{formatLabel(label)}</span>
+        <span className="claim-info-label">
+          {formatLabel(label)}
+          {meta && <ConfidenceBadge meta={meta} />}
+        </span>
         <div className="claim-details-nested-block">
-          {Object.entries(value).map(([k, v]) => (
-            <div key={k} className="claim-details-field">
-              <span className="claim-info-label">{formatLabel(k)}</span>
-              <span className="claim-info-value">{formatPrimitive(v)}</span>
-            </div>
-          ))}
+          {Object.entries(value).map(([k, v]) => {
+            const nestedPath = `${fieldPath}.${k}`;
+            const subMeta = metadata ? (metadata[nestedPath] || metadata[k]) : null;
+            return (
+              <div key={k} className="claim-details-field">
+                <span className="claim-info-label">
+                  {formatLabel(k)}
+                  {subMeta && <ConfidenceBadge meta={subMeta} />}
+                </span>
+                <span className="claim-info-value">{formatPrimitive(v)}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -81,7 +141,10 @@ function FieldRow({ label, value }) {
 
   return (
     <div className="claim-details-field">
-      <span className="claim-info-label">{formatLabel(label)}</span>
+      <span className="claim-info-label">
+        {formatLabel(label)}
+        {meta && <ConfidenceBadge meta={meta} />}
+      </span>
       <span className="claim-info-value">{formatPrimitive(value)}</span>
     </div>
   );
@@ -91,7 +154,7 @@ function sectionId(title) {
   return 'section-' + title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
-function SectionBlock({ title, entries }) {
+function SectionBlock({ title, entries, metadata }) {
   if (!entries.length) return null;
   const id = sectionId(title);
   return (
@@ -101,7 +164,7 @@ function SectionBlock({ title, entries }) {
       </h2>
       <div className="claim-details-grid">
         {entries.map(([key, value]) => (
-          <FieldRow key={key} label={key} value={value} />
+          <FieldRow key={key} label={key} value={value} metadata={metadata} parentPath="" />
         ))}
       </div>
     </section>
@@ -224,7 +287,9 @@ export default function ClaimDetails({ claim: initialClaim, onBack, onEdit }) {
   if (!claim) return null;
 
   const fields = claim.extracted_fields || {};
+  const metadata = fields._field_metadata || {};
   const allKeys = new Set(Object.keys(fields));
+  allKeys.delete('_field_metadata');
   const sectioned = {};
   Object.entries(FIELD_SECTIONS).forEach(([sectionName, keys]) => {
     sectioned[sectionName] = keys
@@ -234,7 +299,7 @@ export default function ClaimDetails({ claim: initialClaim, onBack, onEdit }) {
         return [k, fields[k]];
       });
   });
-  const otherKeys = Array.from(allKeys).map((k) => [k, fields[k]]);
+  const otherKeys = Array.from(allKeys).filter((k) => k !== '_field_metadata').map((k) => [k, fields[k]]);
 
   return (
     <div className="claim-details-container">
@@ -378,10 +443,10 @@ export default function ClaimDetails({ claim: initialClaim, onBack, onEdit }) {
         ) : (
           <>
             {Object.entries(sectioned).map(([title, entries]) => (
-              <SectionBlock key={title} title={title} entries={entries} />
+              <SectionBlock key={title} title={title} entries={entries} metadata={metadata} />
             ))}
             {otherKeys.length > 0 && (
-              <SectionBlock title="Other" entries={otherKeys} />
+              <SectionBlock title="Other" entries={otherKeys} metadata={metadata} />
             )}
           </>
         )}
